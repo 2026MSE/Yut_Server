@@ -1,10 +1,12 @@
-package com.example.mse;
+package com.example.mse.service;
 
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import com.example.mse.config.Giphy;
 
 @Service
 

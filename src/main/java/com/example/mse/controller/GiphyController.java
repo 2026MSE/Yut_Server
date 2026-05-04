@@ -1,10 +1,12 @@
-package com.example.mse;
+package com.example.mse.controller;
 
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.example.mse.service.GiphyService;
 
 @RestController
 @RequestMapping("/api/giphy")

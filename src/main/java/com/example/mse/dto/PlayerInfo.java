@@ -1,6 +1,6 @@
 // /state/playerInfo 응답용 (상태 전달용)
 
-package com.example.mse;
+package com.example.mse.dto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,17 +13,12 @@ import lombok.*;
 public class PlayerInfo {
 
     private String playerId;
-
-    private String icon;
-
-    private String profileUrl;
-
     private String name;
 
-    private List<String> chanceCards = new ArrayList<>();
+    private boolean alive = true;
 
-    private String currentEmoticon;
+    private String currentEmoticon = "";
 
-    private boolean alive;
+    private List<String> inventory = new ArrayList<>();
 
 }

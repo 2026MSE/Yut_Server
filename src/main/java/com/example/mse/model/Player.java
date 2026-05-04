@@ -1,6 +1,6 @@
 // 플레이 기본 정보
 
-package com.example.mse;
+package com.example.mse.model;
 
 import lombok.*;
 

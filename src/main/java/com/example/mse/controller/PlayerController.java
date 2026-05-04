@@ -1,4 +1,4 @@
-package com.example.mse;
+package com.example.mse.controller;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -8,8 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.mse.model.Player;
+import com.example.mse.service.DiceBearService;
+import com.example.mse.service.PlayerService;
+
 @RestController
 @RequestMapping("/api/avatar")
+@CrossOrigin(origins = "*")
 
 public class PlayerController {
 
@@ -54,7 +59,7 @@ public class PlayerController {
         player.setProfileUrl(avatarUrl);
 
         playerService.save(player);
-        
+
         return ResponseEntity.ok(player);
     }
 
