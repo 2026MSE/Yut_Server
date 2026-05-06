@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.mse.model.GameRoom;
+import com.example.mse.model.HallState;
 import com.example.mse.model.Scene;
 import com.example.mse.model.StickSide;
 import com.example.mse.service.HallService;
@@ -59,6 +60,15 @@ public class HallController {
             return "Not your turn.";
         }
 
+        // 선언은 MAIN_HALL + DECLARE 상태에서만 가능하도록 확인
+        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.MAIN_HALL) {
+            return "Not in MAIN_HALL.";
+        }
+
+        if (room.getHallState() != HallState.DECLARE) {
+            return "Not in DECLARE phase.";
+        }
+
         if (s1 == StickSide.TAIL) {
             return "Invalid declaration: first private stick cannot be TAIL.";
         }
@@ -90,6 +100,15 @@ public class HallController {
             return "Turn player cannot challenge";
         }
 
+        // 도전은 MAIN_HALL + CHALLENGE 상태에서만 가능하도록 확인
+        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.MAIN_HALL) {
+            return "Not in MAIN_HALL.";
+        }
+
+        if (room.getHallState() != HallState.CHALLENGE) {
+            return "Not in CHALLENGE phase.";
+        }
+
         return hallService.challenge(room, playerId);
     }
 
@@ -101,11 +120,20 @@ public class HallController {
             return "No yut result yet.";
         }
 
+        // 판정은 MAIN_HALL + CHALLENGE 상태에서만 가능하도록 확인
+        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.MAIN_HALL) {
+            return "Not in MAIN_HALL.";
+        }
+
+        if (room.getHallState() != HallState.CHALLENGE) {
+            return "Not in CHALLENGE phase.";
+        }
+
         String judgeResult = hallService.judgeChallenge(room);
 
         turnService.moveCurrentTurnPlayerRoom(room, Scene.YUT_ROOM);
-        
-        //찬미 Map.of-> HashMap으로 변경
+
+        // 찬미 Map.of-> HashMap으로 변경
         Map<String, Object> result = new java.util.HashMap<>();
 
         result.put("judgeResult", judgeResult);

@@ -32,6 +32,11 @@ public class PrivateController {
 
         if (!turnService.isTurnPlayer(room, playerId)) {
             return "Not your turn.";
+
+        // 찬미 현재 턴 플레이어가 PRIVATE_ROOM에 있을 때만 윷 던지기 가능하도록 확인
+        }
+        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.PRIVATE_ROOM) {
+            return "Not in PRIVATE_ROOM.";
         }
 
         return privateService.getResult(room);
@@ -45,6 +50,15 @@ public class PrivateController {
 
         if (!turnService.isTurnPlayer(room, playerId)) {
             return "Not your turn.";
+        }
+
+        // 찬미 현재 턴 플레이어가 PRIVATE_ROOM에 있을 때만, 윷을 던진 후에만 퇴장 가능하도록 확인
+        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.PRIVATE_ROOM) {
+            return "Not in PRIVATE_ROOM.";
+        }
+
+        if (!room.isAlreadyThrown()) {
+            return "You must throw yut first.";
         }
 
         turnService.moveCurrentTurnPlayerRoom(room, Scene.MAIN_HALL);
