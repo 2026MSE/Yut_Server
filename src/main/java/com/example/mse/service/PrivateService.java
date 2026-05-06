@@ -45,8 +45,9 @@ public class PrivateService {
     private StickSide[] generateSticks() {
         StickSide[] sticks = new StickSide[4];
 
-        sticks[0] = random.nextInt(50) == 0
-                ? StickSide.BACK // 50% 확률
+        // 찬미 첫 번째는 백도 여부 결정
+        sticks[0] = random.nextBoolean()
+                ? StickSide.BACK
                 : StickSide.HEAD;
 
         // 나머지 3개
@@ -59,45 +60,50 @@ public class PrivateService {
         return sticks;
     }
 
+    // 찬미 백도 로직 이상해서 backside기준으로 수정
     private YutResult calculateResult(StickSide[] sticks) {
         YutResult result = new YutResult();
 
-        int headCount = 0;
-        boolean back = false;
+        boolean hasBack = sticks[0] == StickSide.BACK;
+
+        int backSideCount = 0;
 
         for (StickSide stick : sticks) {
-            if (stick == StickSide.BACK) {
-                back = true;
-            } else if (stick == StickSide.HEAD) {
-                headCount++;
+            if (stick == StickSide.TAIL || stick == StickSide.BACK) {
+                backSideCount++;
             }
         }
 
-        if (back) {
+        // BACK + HEAD + HEAD + HEAD
+        if (hasBack && backSideCount == 1) {
             result.setResult(YutName.BACK_DO);
             result.setMove(-1);
             result.setExtraTurn(false);
             return result;
         }
 
-        switch (headCount) {
+        switch (backSideCount) {
             case 1:
                 result.setResult(YutName.DO);
                 result.setMove(1);
                 break;
+
             case 2:
                 result.setResult(YutName.GAE);
                 result.setMove(2);
                 break;
+
             case 3:
                 result.setResult(YutName.GEOL);
                 result.setMove(3);
                 break;
+
             case 4:
                 result.setResult(YutName.YUT);
                 result.setMove(4);
                 result.setExtraTurn(true);
                 break;
+
             case 0:
                 result.setResult(YutName.MO);
                 result.setMove(5);
