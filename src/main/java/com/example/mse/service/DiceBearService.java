@@ -8,9 +8,9 @@ public class DiceBearService {
 
     private static final String BASE_URL = "https://api.dicebear.com/9.x";
     private final RestTemplate restTemplate = new RestTemplate();
-
+// url svg에서 png로 변경
     public String getAvatarUrl(String style, String seed) {
-        return BASE_URL + "/" + style + "/svg?seed=" + seed;
+        return BASE_URL + "/" + style + "/png?seed=" + seed;
     }
 
     public byte[] fetchAvatar(String style, String seed) {

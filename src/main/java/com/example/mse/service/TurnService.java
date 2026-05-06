@@ -10,6 +10,7 @@ import com.example.mse.dto.TurnInfo;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.HallState;
 import com.example.mse.model.Scene;
+import com.example.mse.model.StickSide;
 
 @Service
 public class TurnService {
@@ -48,7 +49,8 @@ public class TurnService {
         room.setAlreadyThrown(false);
         room.setCurrentYutResult(null);
         room.setHallState(HallState.DECLARE);
-        room.setDeclaredYut(null);
+        //찬미 declare 윷 초기화 방식 수정
+        room.setDeclaredPrivateSticks(new StickSide[2]);
         room.setFirstChallengerId(null);
         room.getChallengeQueue().clear();
     }

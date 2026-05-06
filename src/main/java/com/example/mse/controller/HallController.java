@@ -69,11 +69,15 @@ public class HallController {
 
         hallService.declarePrivateSticks(room, s1, s2);
 
-        return Map.of(
-                "message", "Declared private sticks",
-                "declaredPrivateSticks", room.getDeclaredPrivateSticks(),
-                "publicSticks", room.getPublicSticks(),
-                "state", room.getHallState());
+        // 찬미 Map.of-> HashMap으로 변경
+        Map<String, Object> result = new java.util.HashMap<>();
+
+        result.put("message", "Declared private sticks");
+        result.put("declaredPrivateSticks", room.getDeclaredPrivateSticks());
+        result.put("publicSticks", room.getPublicSticks());
+        result.put("state", room.getHallState());
+
+        return result;
     }
 
     @GetMapping("/challenge")
@@ -100,14 +104,17 @@ public class HallController {
         String judgeResult = hallService.judgeChallenge(room);
 
         turnService.moveCurrentTurnPlayerRoom(room, Scene.YUT_ROOM);
+        
+        //찬미 Map.of-> HashMap으로 변경
+        Map<String, Object> result = new java.util.HashMap<>();
 
-        return Map.of(
-                "judgeResult", judgeResult,
-                "actualPrivateSticks", room.getPrivateSticks(),
-                "declaredPrivateSticks", room.getDeclaredPrivateSticks(),
-                "publicSticks", room.getPublicSticks(),
-                "actualResult", room.getCurrentYutResult(),
-                "nextRoom", "YUT_ROOM");
+        result.put("judgeResult", judgeResult);
+        result.put("actualPrivateSticks", room.getPrivateSticks());
+        result.put("declaredPrivateSticks", room.getDeclaredPrivateSticks());
+        result.put("publicSticks", room.getPublicSticks());
+        result.put("actualResult", room.getCurrentYutResult());
+        result.put("nextRoom", "YUT_ROOM");
+
+        return result;
     }
-
 }

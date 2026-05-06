@@ -43,7 +43,6 @@ public class PlayerService {
 
             info.setPlayerId(player.getId());
             info.setName(player.getName());
-            info.setAlive(true);
             info.setCurrentEmoticon("");
 
             result.add(info);

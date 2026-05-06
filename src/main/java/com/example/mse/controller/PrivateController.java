@@ -61,11 +61,14 @@ public class PrivateController {
         if (!turnService.isTurnPlayer(room, playerId)) {
             return "Not your turn.";
         }
+        // 찬미 Map.of-> HashMap으로 변경
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
 
-        return java.util.Map.of(
-                "sticks", room.getSticks(),
-                "privateSticks", room.getPrivateSticks(),
-                "publicSticks", room.getPublicSticks(),
-                "result", room.getCurrentYutResult());
+        result.put("sticks", room.getSticks());
+        result.put("privateSticks", room.getPrivateSticks());
+        result.put("publicSticks", room.getPublicSticks());
+        result.put("result", room.getCurrentYutResult());
+
+        return result;
     }
 }

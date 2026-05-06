@@ -20,7 +20,6 @@ public class GameRoom {
     private TurnInfo turnInfo = new TurnInfo();
 
     private HallState hallState = HallState.DECLARE;
-    private YutName declaredYut;
 
     private YutResult currentYutResult;
     private boolean alreadyThrown = false;

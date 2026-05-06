@@ -15,9 +15,8 @@ public class PlayerInfo {
     private String playerId;
     private String name;
 
-    private boolean alive = true;
-
     private String currentEmoticon = "";
+    private String profileUrl = "";
 
     private List<String> inventory = new ArrayList<>();
 
