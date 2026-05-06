@@ -37,8 +37,13 @@ public class BoardService {
     boardMap.get(24).setFastNodeId(22);
 
     boardMap.get(22).setFastNodeId(25);
+    boardMap.get(22).setNextNodeId(27);
+
     boardMap.get(25).setFastNodeId(26);
-    boardMap.get(26).setFastNodeId(20);
+    boardMap.get(26).setFastNodeId(0);
+
+    boardMap.get(27).setFastNodeId(28);
+    boardMap.get(28).setFastNodeId(15);
 
     return boardMap;
     }
@@ -73,6 +78,7 @@ public class BoardService {
         }
 
         int targetPos = currentPos;
+        int prevPos = currentPos;
         boolean isFirstStep = true;
 
         for(int i = 0;i<moveAmount;i++){
@@ -82,16 +88,26 @@ public class BoardService {
             }
 
             BoardNode currentNode = (targetPos == -1) ?nodeMap.get(0) : nodeMap.get(targetPos);
+            int nextPos;
 
-            // [지름길 타기 룰]
-            // 첫 번째 발걸음(isFirstStep)인데, 현재 서 있는 칸에 지름길(FastNode)이 있다면 꺾습니다!
-            if(isFirstStep && currentNode.getFastNodeId() != null){
-                targetPos = currentNode.getFastNodeId();
-            }else{
-                // 그 외의 경우는 무조건 기본 길(NextNode)로 직진합니다.
-                targetPos = currentNode.getNextNodeId();
+            if(currentNode.getId()==22 && !isFirstStep){
+                if(prevPos == 21){
+                    nextPos = 27;
+                }else{
+                    nextPos = 25;
+                }
             }
 
+            else if (isFirstStep && currentNode.getFastNodeId() != null) {
+                nextPos = currentNode.getFastNodeId();
+            } 
+            // 그 외의 경우는 무조건 기본 길(NextNode)로 직진
+            else {
+                nextPos = currentNode.getNextNodeId();
+            }
+
+            prevPos = targetPos;
+            targetPos = nextPos;
             isFirstStep = false;
         }
 
@@ -108,6 +124,15 @@ public class BoardService {
         if(currentPos == -1 || currentPos ==0){
             return currentPos;
         }
+
+        if (currentPos == 25 || currentPos == 27) {
+            return 22;
+        }
+
+        if(currentPos == 15){
+            return 14;
+        }
+
         // 전체 윷판을 뒤져서 "누가 나를 가리키고 있는지(나의 이전 칸)"를 찾습니다.
         for(BoardNode node : board.getNodeMap().values()){
             if(node.getNextNodeId() != null && node.getNextNodeId() ==currentPos){
@@ -169,7 +194,7 @@ public class BoardService {
         movingPiece.setCurrentPosition(targetPos);
         targetPieces.add(movingPiece);
 
-        return "CATAH";
+        return "CATCH";
     }
     }
 }
