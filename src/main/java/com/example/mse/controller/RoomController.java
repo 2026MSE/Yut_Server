@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.mse.dto.RoomInfo;
 import com.example.mse.model.GameRoom;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
@@ -21,32 +22,42 @@ public class RoomController {
     @Autowired
     private TurnService turnService;
 
+    // 찬미 RoomInfo 관련 코드 수정
     @GetMapping("/create")
-    public GameRoom createRoom(@RequestParam String playerId) {
-        return roomService.createRoom(playerId);
+    public RoomInfo createRoom(@RequestParam String playerId) {
+        GameRoom room = roomService.createRoom(playerId);
+        return roomService.toRoomInfo(room);
     }
 
     @GetMapping("/join")
-    public GameRoom joinRoom(
+    public RoomInfo joinRoom(
             @RequestParam String roomId,
             @RequestParam String playerId) {
-        return roomService.joinRoom(roomId, playerId);
+        GameRoom room = roomService.joinRoom(roomId, playerId);
+        return roomService.toRoomInfo(room);
     }
 
     @GetMapping("/state")
-    public GameRoom getRoomState(@RequestParam String roomId) {
-        return roomService.getRoom(roomId);
+    public RoomInfo getRoomState(@RequestParam String roomId) {
+        GameRoom room = roomService.requireRoom(roomId);
+        return roomService.toRoomInfo(room);
     }
 
     @GetMapping("/all")
-    public Map<String, GameRoom> getAllRooms() {
-        return roomService.getAllRooms();
+    public Map<String, RoomInfo> getAllRooms() {
+        Map<String, RoomInfo> result = new java.util.HashMap<>();
+
+        for (Map.Entry<String, GameRoom> entry : roomService.getAllRooms().entrySet()) {
+            result.put(entry.getKey(), roomService.toRoomInfo(entry.getValue()));
+        }
+
+        return result;
     }
 
     @GetMapping("/start")
-    public GameRoom startRoom(@RequestParam String roomId) {
+    public RoomInfo startRoom(@RequestParam String roomId) {
         GameRoom room = roomService.startRoom(roomId);
         turnService.startGame(room);
-        return room;
+        return roomService.toRoomInfo(room);
     }
 }
