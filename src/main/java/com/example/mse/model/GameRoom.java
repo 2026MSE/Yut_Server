@@ -34,4 +34,6 @@ public class GameRoom {
     private String firstChallengerId;
     private List<String> challengeQueue = new ArrayList<>();
 
+    //영준 추가함
+    private Board board = new Board();
 }

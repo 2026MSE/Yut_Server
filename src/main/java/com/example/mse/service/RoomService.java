@@ -5,13 +5,19 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.example.mse.model.BoardNode;
 import com.example.mse.model.GameRoom;
 
 @Service
 public class RoomService {
 
     private Map<String, GameRoom> rooms = new HashMap<>();
+
+    //영준 추가함.
+    @Autowired
+    private BoardService boardService; // 지도를 그려주는 서비스
 
     public GameRoom createRoom(String playerId) {
         GameRoom room = new GameRoom();
@@ -58,6 +64,14 @@ public class RoomService {
         }
 
         room.setStarted(true);
+
+        //영준 추가
+        // 게임이 시작되면, BoardService에게 지도를 받아와서 방의 보드판에 장착합니다.
+        Map<Integer, BoardNode> initialMap = boardService.initBoard();
+        room.getBoard().setNodeMap(initialMap);
+
+        //추가된 부분 2.플레이어한테 말 4개씩 쥐어주기
+        boardService.initPieces(room.getBoard(), room.getPlayerIds());
 
         return room;
     }
