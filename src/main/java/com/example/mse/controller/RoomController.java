@@ -29,13 +29,13 @@ public class RoomController {
     private PlayerService playerService;
 
     // 찬미 RoomInfo 관련 코드 수정
-    @GetMapping("/create")
+    @PostMapping("/create")
     public RoomInfo createRoom(@RequestParam String playerId) {
         GameRoom room = roomService.createRoom(playerId);
         return roomService.toRoomInfo(room);
     }
 
-    @GetMapping("/join")
+    @PostMapping("/join")
     public RoomInfo joinRoom(
             @RequestParam String roomId,
             @RequestParam String playerId) {
@@ -60,13 +60,13 @@ public class RoomController {
         return result;
     }
 
-    @GetMapping("/start")
+    @PostMapping("/start")
     public RoomInfo startRoom(@RequestParam String roomId) {
         GameRoom room = roomService.startRoom(roomId);
         turnService.startGame(room);
         return roomService.toRoomInfo(room);
     }
-    
+
     //찬미 플레이어 정보 확인 endpoint 추가
     @GetMapping("/players")
     public List<PlayerInfo> getRoomPlayers(@RequestParam String roomId) {

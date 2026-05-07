@@ -24,7 +24,7 @@ public class PrivateController {
     @Autowired
     private RoomService roomService;
 
-    @GetMapping("/result")
+    @PostMapping("/result")
     public Object getPrivateResult(
             @RequestParam String roomId,
             @RequestParam String playerId) {
@@ -42,7 +42,7 @@ public class PrivateController {
         return privateService.getResult(room);
     }
 
-    @GetMapping("/exit")
+    @PostMapping("/exit")
     public String exitPrivate(
             @RequestParam String roomId,
             @RequestParam String playerId) {

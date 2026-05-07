@@ -19,7 +19,7 @@ public class TurnController {
     @Autowired
     private RoomService roomService;
 
-    @GetMapping("/next")
+    @PostMapping("/next")
     public Object nextTurn(
             @RequestParam String roomId,
             @RequestParam String playerId) {

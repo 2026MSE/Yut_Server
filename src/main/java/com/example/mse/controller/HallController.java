@@ -48,7 +48,7 @@ public class HallController {
         return result;
     }
 
-    @GetMapping("/declare")
+    @PostMapping("/declare")
     public Object declare(
             @RequestParam String roomId,
             @RequestParam String playerId,
@@ -90,7 +90,7 @@ public class HallController {
         return result;
     }
 
-    @GetMapping("/challenge")
+    @PostMapping("/challenge")
     public Object challenge(
             @RequestParam String roomId,
             @RequestParam String playerId) {
@@ -112,7 +112,7 @@ public class HallController {
         return hallService.challenge(room, playerId);
     }
 
-    @GetMapping("/judge")
+    @PostMapping("/judge")
     public Object judge(@RequestParam String roomId) {
         GameRoom room = roomService.requireRoom(roomId);
 

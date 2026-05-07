@@ -38,7 +38,7 @@ public class YutController {
     @Autowired
     private PrivateService privateService;
 
-    @GetMapping("/end")
+    @PostMapping("/end")
     public Object endTurn(
             @RequestParam String roomId,
             @RequestParam String playerId) {
@@ -59,7 +59,7 @@ public class YutController {
     }
 
     // 찬미 윷 이동 api 추가, 추가턴 여부 반환
-    @GetMapping("/move")
+    @PostMapping("/move")
     public Object movePiece(
             @RequestParam String roomId,
             @RequestParam String playerId,
@@ -139,10 +139,10 @@ public class YutController {
         result.put("moveType", moveType);
         result.put("yutResult", yutResult);
 
-        return result;
+        return ApiResponse.ok("Piece moved.", result);
     }
 
-    @GetMapping("/throw")
+    @PostMapping("/throw")
     public Object throwAgain(
             @RequestParam String roomId,
             @RequestParam String playerId) {
