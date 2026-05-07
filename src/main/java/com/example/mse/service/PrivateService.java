@@ -120,6 +120,7 @@ public class PrivateService {
 
     public void resetTurn(GameRoom room) {
         room.setAlreadyThrown(false);
+        room.setAlreadyMoved(false);
         room.setCurrentYutResult(null);
         room.setSticks(new StickSide[4]);
         room.setPrivateSticks(new StickSide[2]);

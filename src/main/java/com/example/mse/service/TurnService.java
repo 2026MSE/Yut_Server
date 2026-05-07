@@ -48,6 +48,7 @@ public class TurnService {
 
         room.setAlreadyThrown(false);
         room.setCurrentYutResult(null);
+        room.setAlreadyMoved(false);
         room.setHallState(HallState.DECLARE);
         //찬미 declare 윷 초기화 방식 수정
         room.setDeclaredPrivateSticks(new StickSide[2]);
