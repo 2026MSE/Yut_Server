@@ -8,7 +8,6 @@ import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.GameActionRequest;
-import com.example.mse.dto.ThrowResponse;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Scene;
 
@@ -68,6 +67,7 @@ public class PrivateController {
         return ApiResponse.ok("Moved to MAIN_HALL", null);
     }
 
+    //찬미 불필요 데이터 삭제
     @GetMapping("/info")
     public Object privateInfo(
             @RequestParam String roomId,
@@ -77,13 +77,6 @@ public class PrivateController {
         if (!turnService.isTurnPlayer(room, playerId)) {
             return ApiResponse.fail("Not your turn.");
         }
-        // 찬미 Map.of-> HashMap으로 변경 -> dto로 변경
-        ThrowResponse response = new ThrowResponse();
-
-        response.setSticks(room.getSticks());
-        response.setPrivateSticks(room.getPrivateSticks());
-        response.setPublicSticks(room.getPublicSticks());
-        response.setResult(room.getCurrentYutResult());
 
         return ApiResponse.ok(
                 "Private info loaded.",
