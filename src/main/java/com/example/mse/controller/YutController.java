@@ -11,8 +11,10 @@ import com.example.mse.model.GameRoom;
 import com.example.mse.model.MoveType;
 import com.example.mse.model.Piece;
 import com.example.mse.model.Scene;
+import com.example.mse.model.StickSide;
 import com.example.mse.model.YutResult;
 import com.example.mse.service.BoardService;
+import com.example.mse.service.PrivateService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
 
@@ -30,6 +32,9 @@ public class YutController {
 
     @Autowired
     private BoardService boardService;
+
+    @Autowired
+    private PrivateService privateService;
 
     @GetMapping("/end")
     public Object endTurn(
@@ -51,7 +56,7 @@ public class YutController {
         return room.getTurnInfo();
     }
 
-    // 찬미 윷 이동 api 추가
+    // 찬미 윷 이동 api 추가, 추가턴 여부 반환
     @GetMapping("/move")
     public Object movePiece(
             @RequestParam String roomId,
@@ -70,6 +75,10 @@ public class YutController {
 
         YutResult yutResult = room.getCurrentYutResult();
 
+        if (room.isAlreadyMoved()) {
+            return "Already moved this turn.";
+        }
+
         if (yutResult == null) {
             return "No yut result.";
         }
@@ -87,9 +96,10 @@ public class YutController {
         }
 
         int fromPos = movingPiece.getCurrentPosition();
+
         int targetPos = boardService.calculateNextPath(
                 board,
-                movingPiece.getCurrentPosition(),
+                fromPos,
                 yutResult.getMove());
 
         MoveType moveType = boardService.movePieceAndCheckCatch(
@@ -99,6 +109,27 @@ public class YutController {
 
         Map<String, Object> result = new HashMap<>();
 
+        boolean extraTurn = yutResult.isExtraTurn() || moveType == MoveType.CATCH;
+
+        if (extraTurn) {
+            room.setAlreadyThrown(false);
+            room.setAlreadyMoved(false);
+            room.setCurrentYutResult(null);
+
+            room.setSticks(new StickSide[4]);
+            room.setPrivateSticks(new StickSide[2]);
+            room.setPublicSticks(new StickSide[2]);
+            room.setDeclaredPrivateSticks(new StickSide[2]);
+
+            result.put("extraTurn", true);
+            result.put("nextAction", "THROW_AGAIN_IN_YUT_ROOM");
+        } else {
+            room.setAlreadyMoved(true);
+
+            result.put("extraTurn", false);
+            result.put("nextAction", "END_TURN");
+        }
+
         result.put("message", "Piece moved");
         result.put("pieceId", pieceId);
         result.put("from", fromPos);
@@ -107,5 +138,27 @@ public class YutController {
         result.put("yutResult", yutResult);
 
         return result;
+    }
+
+    @GetMapping("/throw")
+    public Object throwAgain(
+            @RequestParam String roomId,
+            @RequestParam String playerId) {
+
+        GameRoom room = roomService.requireRoom(roomId);
+
+        if (!turnService.isTurnPlayer(room, playerId)) {
+            return "Not your turn.";
+        }
+
+        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.YUT_ROOM) {
+            return "Not in YUT_ROOM.";
+        }
+
+        if (room.isAlreadyThrown()) {
+            return "Already thrown.";
+        }
+
+        return privateService.getResult(room);
     }
 }
