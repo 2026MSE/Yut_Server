@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.GameActionRequest;
 import com.example.mse.dto.PlayerInfo;
 import com.example.mse.dto.RoomInfo;
@@ -31,17 +32,23 @@ public class RoomController {
 
     // 찬미 RoomInfo 관련 코드 수정
     @PostMapping("/create")
-    public RoomInfo createRoom(@RequestBody GameActionRequest request) {
+    public Object createRoom(@RequestBody GameActionRequest request) {
         GameRoom room = roomService.createRoom(request.getPlayerId());
-        return roomService.toRoomInfo(room);
+
+        return ApiResponse.ok(
+                "Room created.",
+                roomService.toRoomInfo(room));
     }
 
     @PostMapping("/join")
-    public RoomInfo joinRoom(@RequestBody GameActionRequest request) {
+    public Object joinRoom(@RequestBody GameActionRequest request) {
         GameRoom room = roomService.joinRoom(
                 request.getRoomId(),
                 request.getPlayerId());
-        return roomService.toRoomInfo(room);
+
+        return ApiResponse.ok(
+                "Joined room.",
+                roomService.toRoomInfo(room));
     }
 
     @GetMapping("/state")
@@ -62,10 +69,13 @@ public class RoomController {
     }
 
     @PostMapping("/start")
-    public RoomInfo startRoom(@RequestBody GameActionRequest request) {
+    public Object startRoom(@RequestBody GameActionRequest request) {
         GameRoom room = roomService.startRoom(request.getRoomId());
         turnService.startGame(room);
-        return roomService.toRoomInfo(room);
+
+        return ApiResponse.ok(
+                "Game started.",
+                roomService.toRoomInfo(room));
     }
 
     // 찬미 플레이어 정보 확인 endpoint 추가
