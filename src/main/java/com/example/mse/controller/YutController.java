@@ -1,9 +1,6 @@
 //26.05.07 찬미 String 반환 방식에서 ApiResponse 객체 반환 방식으로 변경, requestbody DTO로 변경
 package com.example.mse.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +18,7 @@ import com.example.mse.service.TurnService;
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.MoveRequest;
 import com.example.mse.dto.PlayerActionRequest;
+import com.example.mse.dto.MoveResponse;
 
 @RestController
 @RequestMapping("/yut")
@@ -107,7 +105,7 @@ public class YutController {
                 movingPiece,
                 targetPos);
 
-        Map<String, Object> result = new HashMap<>();
+        MoveResponse result = new MoveResponse();
 
         boolean extraTurn = yutResult.isExtraTurn() || moveType == MoveType.CATCH;
 
@@ -121,21 +119,20 @@ public class YutController {
             room.setPublicSticks(new StickSide[2]);
             room.setDeclaredPrivateSticks(new StickSide[2]);
 
-            result.put("extraTurn", true);
-            result.put("nextAction", "THROW_AGAIN_IN_YUT_ROOM");
+            result.setExtraTurn(true);
+            result.setNextAction("THROW_AGAIN_IN_YUT_ROOM");
         } else {
             room.setAlreadyMoved(true);
 
-            result.put("extraTurn", false);
-            result.put("nextAction", "END_TURN");
+            result.setExtraTurn(false);
+            result.setNextAction("END_TURN");
         }
 
-        result.put("message", "Piece moved");
-        result.put("pieceId", request.getPieceId());
-        result.put("from", fromPos);
-        result.put("to", targetPos);
-        result.put("moveType", moveType);
-        result.put("yutResult", yutResult);
+        result.setPieceId(request.getPieceId());
+        result.setFrom(fromPos);
+        result.setTo(targetPos);
+        result.setMoveType(moveType);
+        result.setYutResult(yutResult);
 
         return ApiResponse.ok("Piece moved.", result);
     }

@@ -8,6 +8,7 @@ import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.PlayerActionRequest;
+import com.example.mse.dto.PrivateInfoResponse;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Scene;
 
@@ -62,7 +63,7 @@ public class PrivateController {
 
         turnService.moveCurrentTurnPlayerRoom(room, Scene.MAIN_HALL);
 
-        return ApiResponse.ok("Moved to MAIN_HALL",null);
+        return ApiResponse.ok("Moved to MAIN_HALL", null);
     }
 
     @GetMapping("/info")
@@ -74,14 +75,16 @@ public class PrivateController {
         if (!turnService.isTurnPlayer(room, playerId)) {
             return ApiResponse.fail("Not your turn.");
         }
-        // 찬미 Map.of-> HashMap으로 변경
-        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        // 찬미 Map.of-> HashMap으로 변경 -> dto로 변경
+        PrivateInfoResponse response = new PrivateInfoResponse();
 
-        result.put("sticks", room.getSticks());
-        result.put("privateSticks", room.getPrivateSticks());
-        result.put("publicSticks", room.getPublicSticks());
-        result.put("result", room.getCurrentYutResult());
+        response.setSticks(room.getSticks());
+        response.setPrivateSticks(room.getPrivateSticks());
+        response.setPublicSticks(room.getPublicSticks());
+        response.setResult(room.getCurrentYutResult());
 
-        return result;
+        return ApiResponse.ok(
+                "Private info loaded.",
+                response);
     }
 }

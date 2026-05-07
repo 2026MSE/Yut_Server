@@ -1,12 +1,12 @@
 package com.example.mse.controller;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.DeclareRequest;
+import com.example.mse.dto.DeclareResponse;
+import com.example.mse.dto.HallInfoResponse;
 import com.example.mse.dto.RoomRequest;
 import com.example.mse.dto.PlayerActionRequest;
 import com.example.mse.model.GameRoom;
@@ -16,6 +16,7 @@ import com.example.mse.model.StickSide;
 import com.example.mse.service.HallService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
+import com.example.mse.dto.JudgeResponse;
 
 @RestController
 @RequestMapping("/hall")
@@ -37,19 +38,20 @@ public class HallController {
         return room.getHallState();
     }
 
+    // 찬미 dto로 변경
     @GetMapping("/info")
     public Object info(@RequestParam String roomId) {
         GameRoom room = roomService.requireRoom(roomId);
 
-        Map<String, Object> result = new java.util.HashMap<>();
+        HallInfoResponse response = new HallInfoResponse();
 
-        result.put("state", room.getHallState());
-        result.put("publicSticks", room.getPublicSticks());
-        result.put("declaredPrivateSticks", room.getDeclaredPrivateSticks());
-        result.put("firstChallenger", room.getFirstChallengerId());
-        result.put("queue", room.getChallengeQueue());
+        response.setState(room.getHallState());
+        response.setPublicSticks(room.getPublicSticks());
+        response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
+        response.setFirstChallenger(room.getFirstChallengerId());
+        response.setQueue(room.getChallengeQueue());
 
-        return result;
+        return ApiResponse.ok("Hall info loaded.", response);
     }
 
     @PostMapping("/declare")
@@ -79,15 +81,15 @@ public class HallController {
 
         hallService.declarePrivateSticks(room, request.getS1(), request.getS2());
 
-        // 찬미 Map.of-> HashMap으로 변경
-        Map<String, Object> result = new java.util.HashMap<>();
+        // 찬미 Map.of-> HashMap으로 변경 -> dto로 변경
+        DeclareResponse response = new DeclareResponse();
 
-        result.put("message", "Declared private sticks");
-        result.put("declaredPrivateSticks", room.getDeclaredPrivateSticks());
-        result.put("publicSticks", room.getPublicSticks());
-        result.put("state", room.getHallState());
+        response.setMessage("Declared private sticks");
+        response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
+        response.setPublicSticks(room.getPublicSticks());
+        response.setState(room.getHallState());
 
-        return result;
+        return ApiResponse.ok("Declared private sticks.", response);
     }
 
     @PostMapping("/challenge")
@@ -127,20 +129,25 @@ public class HallController {
             return ApiResponse.fail("Not in CHALLENGE phase.");
         }
 
+        // 찬미 도전자가 없으면 판정 불가하도록 확인
+        if (room.getFirstChallengerId() == null) {
+            return ApiResponse.fail("No challenger.");
+        }
+
         String judgeResult = hallService.judgeChallenge(room);
 
         turnService.moveCurrentTurnPlayerRoom(room, Scene.YUT_ROOM);
 
-        // 찬미 Map.of-> HashMap으로 변경
-        Map<String, Object> result = new java.util.HashMap<>();
+        // 찬미 Map.of-> HashMap으로 변경 -> JudgeResponse DTO로 변경
+        JudgeResponse response = new JudgeResponse();
 
-        result.put("judgeResult", judgeResult);
-        result.put("actualPrivateSticks", room.getPrivateSticks());
-        result.put("declaredPrivateSticks", room.getDeclaredPrivateSticks());
-        result.put("publicSticks", room.getPublicSticks());
-        result.put("actualResult", room.getCurrentYutResult());
-        result.put("nextRoom", "YUT_ROOM");
+        response.setJudgeResult(judgeResult);
+        response.setActualPrivateSticks(room.getPrivateSticks());
+        response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
+        response.setPublicSticks(room.getPublicSticks());
+        response.setActualResult(room.getCurrentYutResult());
+        response.setNextRoom("YUT_ROOM");
 
-        return result;
+        return ApiResponse.ok("Challenge judged.", response);
     }
 }
