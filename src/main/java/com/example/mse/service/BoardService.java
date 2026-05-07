@@ -214,13 +214,30 @@ public class BoardService {
 
             targetPiece.getCarriedPieces().clear();
 
-            //targetPos 칸 비우기
+            // targetPos 칸 비우기
             targetPieces.clear();
-            //이동한 말 targetPos로 이동
+            // 이동한 말 targetPos로 이동
             movingPiece.setCurrentPosition(targetPos);
             targetPieces.add(movingPiece);
 
             return MoveType.CATCH;
         }
+    }
+    
+    // 찬미 말 찾는 메서드 추가
+    public Piece findPiece(Board board, String playerId, String pieceId) {
+        List<Piece> pieces = board.getPieces().get(playerId);
+
+        if (pieces == null) {
+            return null;
+        }
+
+        for (Piece piece : pieces) {
+            if (piece.getId().equals(pieceId)) {
+                return piece;
+            }
+        }
+
+        return null;
     }
 }
