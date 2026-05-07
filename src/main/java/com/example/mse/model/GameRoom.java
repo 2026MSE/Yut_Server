@@ -15,6 +15,7 @@ import lombok.Setter;
 public class GameRoom {
 
     private String roomId;
+    
     //방에 들어온 플레이어 아이디 목록
     private List<String> playerIds = new ArrayList<>();
 

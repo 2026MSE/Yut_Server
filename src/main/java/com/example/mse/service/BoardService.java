@@ -51,6 +51,9 @@ public class BoardService {
     public void initPieces(Board board, List<String> playerIds){
         Map<String, List<Piece>> piecesMap = new HashMap<>();
 
+        //찬미 대기석 추가
+        board.getNodePiecesMap().putIfAbsent(-1, new ArrayList<>());
+
         for(String playerId : playerIds){
             List<Piece> playerPieces = new ArrayList<>();
 
@@ -61,6 +64,9 @@ public class BoardService {
                 //Piece 생성자에게 currentPosition은 -1로 자동 설정됨.
 
                 playerPieces.add(piece);
+
+                //찬미 대기석(-1)에 말 추가
+                board.getNodePiecesMap().get(-1).add(piece);
             }
             //이 플레이어의 말 4개는 이것들입니다 하고 맵에 저장
             piecesMap.put(playerId, playerPieces);
