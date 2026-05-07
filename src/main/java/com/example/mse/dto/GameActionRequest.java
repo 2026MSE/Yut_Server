@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PlayerActionRequest {
+public class GameActionRequest {
 
     private String roomId;
     private String playerId;
