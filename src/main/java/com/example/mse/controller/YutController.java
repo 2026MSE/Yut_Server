@@ -1,3 +1,4 @@
+//26.05.07 찬미 String 반환 방식에서 ApiResponse 객체 반환 방식으로 변경
 package com.example.mse.controller;
 
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import com.example.mse.service.BoardService;
 import com.example.mse.service.PrivateService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
+import com.example.mse.dto.ApiResponse;
 
 @RestController
 @RequestMapping("/yut")
@@ -43,17 +45,17 @@ public class YutController {
         GameRoom room = roomService.requireRoom(roomId);
 
         if (!turnService.isTurnPlayer(room, playerId)) {
-            return "Not your turn.";
+            return ApiResponse.fail("Not your turn.");
         }
 
         // 찬미 현재 턴 플레이어가 YUT_ROOM에 있을 때만 턴 종료 가능하도록 확인
         if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.YUT_ROOM) {
-            return "Not in YUT_ROOM.";
+            return ApiResponse.fail("Not in YUT_ROOM.");
         }
 
         turnService.nextTurn(room);
 
-        return room.getTurnInfo();
+        return ApiResponse.ok("Turn ended.", room.getTurnInfo());
     }
 
     // 찬미 윷 이동 api 추가, 추가턴 여부 반환
@@ -66,21 +68,21 @@ public class YutController {
         GameRoom room = roomService.requireRoom(roomId);
 
         if (!turnService.isTurnPlayer(room, playerId)) {
-            return "Not your turn.";
+            return ApiResponse.fail("Not your turn.");
         }
 
         if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.YUT_ROOM) {
-            return "Not in YUT_ROOM.";
+            return ApiResponse.fail("Not in YUT_ROOM.");
         }
 
         YutResult yutResult = room.getCurrentYutResult();
 
         if (room.isAlreadyMoved()) {
-            return "Already moved this turn.";
+            return ApiResponse.fail("Already moved this turn.");
         }
 
         if (yutResult == null) {
-            return "No yut result.";
+            return ApiResponse.fail("No yut result.");
         }
 
         Board board = room.getBoard();
@@ -88,11 +90,11 @@ public class YutController {
         Piece movingPiece = boardService.findPiece(board, playerId, pieceId);
 
         if (movingPiece == null) {
-            return "Piece not found.";
+            return ApiResponse.fail("Piece not found.");
         }
 
         if (movingPiece.getCurrentPosition() == 99) {
-            return "This piece already finished.";
+            return ApiResponse.fail("This piece already finished.");
         }
 
         int fromPos = movingPiece.getCurrentPosition();
@@ -148,15 +150,15 @@ public class YutController {
         GameRoom room = roomService.requireRoom(roomId);
 
         if (!turnService.isTurnPlayer(room, playerId)) {
-            return "Not your turn.";
+            return ApiResponse.fail("Not your turn.");
         }
 
         if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.YUT_ROOM) {
-            return "Not in YUT_ROOM.";
+            return ApiResponse.fail("Not in YUT_ROOM.");
         }
 
         if (room.isAlreadyThrown()) {
-            return "Already thrown.";
+            return ApiResponse.fail("Already thrown.");
         }
 
         return privateService.getResult(room);
