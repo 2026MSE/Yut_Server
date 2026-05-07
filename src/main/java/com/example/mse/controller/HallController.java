@@ -7,8 +7,7 @@ import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.DeclareRequest;
 import com.example.mse.dto.DeclareResponse;
 import com.example.mse.dto.HallInfoResponse;
-import com.example.mse.dto.RoomRequest;
-import com.example.mse.dto.PlayerActionRequest;
+import com.example.mse.dto.GameActionRequest;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.HallState;
 import com.example.mse.model.Scene;
@@ -35,7 +34,10 @@ public class HallController {
     @GetMapping("/state")
     public Object getState(@RequestParam String roomId) {
         GameRoom room = roomService.requireRoom(roomId);
-        return room.getHallState();
+
+        return ApiResponse.ok(
+                "Hall state loaded.",
+                room.getHallState());
     }
 
     // 찬미 dto로 변경
@@ -93,7 +95,7 @@ public class HallController {
     }
 
     @PostMapping("/challenge")
-    public Object challenge(@RequestBody PlayerActionRequest request) {
+    public Object challenge(@RequestBody GameActionRequest request) {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (turnService.isTurnPlayer(room, request.getPlayerId())) {
@@ -113,7 +115,7 @@ public class HallController {
     }
 
     @PostMapping("/judge")
-    public Object judge(@RequestBody RoomRequest request) {
+    public Object judge(@RequestBody GameActionRequest request) {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (room.getCurrentYutResult() == null) {
