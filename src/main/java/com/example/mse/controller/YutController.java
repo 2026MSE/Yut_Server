@@ -1,4 +1,4 @@
-//26.05.07 찬미 String 반환 방식에서 ApiResponse 객체 반환 방식으로 변경
+//26.05.07 찬미 String 반환 방식에서 ApiResponse 객체 반환 방식으로 변경, requestbody DTO로 변경
 package com.example.mse.controller;
 
 import java.util.HashMap;
@@ -19,6 +19,8 @@ import com.example.mse.service.PrivateService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
 import com.example.mse.dto.ApiResponse;
+import com.example.mse.dto.MoveRequest;
+import com.example.mse.dto.TurnActionRequest;
 
 @RestController
 @RequestMapping("/yut")
@@ -40,11 +42,10 @@ public class YutController {
 
     @PostMapping("/end")
     public Object endTurn(
-            @RequestParam String roomId,
-            @RequestParam String playerId) {
-        GameRoom room = roomService.requireRoom(roomId);
+            @RequestBody TurnActionRequest request) {
+        GameRoom room = roomService.requireRoom(request.getRoomId());
 
-        if (!turnService.isTurnPlayer(room, playerId)) {
+        if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
             return ApiResponse.fail("Not your turn.");
         }
 
@@ -60,14 +61,11 @@ public class YutController {
 
     // 찬미 윷 이동 api 추가, 추가턴 여부 반환
     @PostMapping("/move")
-    public Object movePiece(
-            @RequestParam String roomId,
-            @RequestParam String playerId,
-            @RequestParam String pieceId) {
+    public Object movePiece(@RequestBody MoveRequest request) {
 
-        GameRoom room = roomService.requireRoom(roomId);
+        GameRoom room = roomService.requireRoom(request.getRoomId());
 
-        if (!turnService.isTurnPlayer(room, playerId)) {
+        if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
             return ApiResponse.fail("Not your turn.");
         }
 
@@ -87,7 +85,7 @@ public class YutController {
 
         Board board = room.getBoard();
 
-        Piece movingPiece = boardService.findPiece(board, playerId, pieceId);
+        Piece movingPiece = boardService.findPiece(board, request.getPlayerId(), request.getPieceId());
 
         if (movingPiece == null) {
             return ApiResponse.fail("Piece not found.");
@@ -133,7 +131,7 @@ public class YutController {
         }
 
         result.put("message", "Piece moved");
-        result.put("pieceId", pieceId);
+        result.put("pieceId", request.getPieceId());
         result.put("from", fromPos);
         result.put("to", targetPos);
         result.put("moveType", moveType);
@@ -144,12 +142,11 @@ public class YutController {
 
     @PostMapping("/throw")
     public Object throwAgain(
-            @RequestParam String roomId,
-            @RequestParam String playerId) {
+            @RequestBody TurnActionRequest request) {
 
-        GameRoom room = roomService.requireRoom(roomId);
+        GameRoom room = roomService.requireRoom(request.getRoomId());
 
-        if (!turnService.isTurnPlayer(room, playerId)) {
+        if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
             return ApiResponse.fail("Not your turn.");
         }
 

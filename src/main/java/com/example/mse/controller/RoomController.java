@@ -6,8 +6,11 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.mse.dto.PlayerActionRequest;
 import com.example.mse.dto.PlayerInfo;
+import com.example.mse.dto.RoomCreateRequest;
 import com.example.mse.dto.RoomInfo;
+import com.example.mse.dto.RoomRequest;
 import com.example.mse.model.GameRoom;
 import com.example.mse.service.PlayerService;
 import com.example.mse.service.RoomService;
@@ -30,16 +33,16 @@ public class RoomController {
 
     // 찬미 RoomInfo 관련 코드 수정
     @PostMapping("/create")
-    public RoomInfo createRoom(@RequestParam String playerId) {
-        GameRoom room = roomService.createRoom(playerId);
+    public RoomInfo createRoom(@RequestBody RoomCreateRequest request) {
+        GameRoom room = roomService.createRoom(request.getPlayerId());
         return roomService.toRoomInfo(room);
     }
 
     @PostMapping("/join")
-    public RoomInfo joinRoom(
-            @RequestParam String roomId,
-            @RequestParam String playerId) {
-        GameRoom room = roomService.joinRoom(roomId, playerId);
+    public RoomInfo joinRoom(@RequestBody PlayerActionRequest request) {
+        GameRoom room = roomService.joinRoom(
+                request.getRoomId(),
+                request.getPlayerId());
         return roomService.toRoomInfo(room);
     }
 
@@ -61,13 +64,13 @@ public class RoomController {
     }
 
     @PostMapping("/start")
-    public RoomInfo startRoom(@RequestParam String roomId) {
-        GameRoom room = roomService.startRoom(roomId);
+    public RoomInfo startRoom(@RequestBody RoomRequest request) {
+        GameRoom room = roomService.startRoom(request.getRoomId());
         turnService.startGame(room);
         return roomService.toRoomInfo(room);
     }
 
-    //찬미 플레이어 정보 확인 endpoint 추가
+    // 찬미 플레이어 정보 확인 endpoint 추가
     @GetMapping("/players")
     public List<PlayerInfo> getRoomPlayers(@RequestParam String roomId) {
         GameRoom room = roomService.requireRoom(roomId);

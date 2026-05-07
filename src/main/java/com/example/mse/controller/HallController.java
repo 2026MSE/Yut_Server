@@ -5,6 +5,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.mse.dto.DeclareRequest;
+import com.example.mse.dto.RoomRequest;
+import com.example.mse.dto.TurnActionRequest;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.HallState;
 import com.example.mse.model.Scene;
@@ -49,14 +52,10 @@ public class HallController {
     }
 
     @PostMapping("/declare")
-    public Object declare(
-            @RequestParam String roomId,
-            @RequestParam String playerId,
-            @RequestParam StickSide s1,
-            @RequestParam StickSide s2) {
-        GameRoom room = roomService.requireRoom(roomId);
+    public Object declare(@RequestBody DeclareRequest request) {
+        GameRoom room = roomService.requireRoom(request.getRoomId());
 
-        if (!turnService.isTurnPlayer(room, playerId)) {
+        if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
             return "Not your turn.";
         }
 
@@ -69,15 +68,15 @@ public class HallController {
             return "Not in DECLARE phase.";
         }
 
-        if (s1 == StickSide.TAIL) {
+        if (request.getS1() == StickSide.TAIL) {
             return "Invalid declaration: first private stick cannot be TAIL.";
         }
 
-        if (s2 == StickSide.BACK) {
+        if (request.getS2() == StickSide.BACK) {
             return "Invalid declaration: second private stick cannot be BACK.";
         }
 
-        hallService.declarePrivateSticks(room, s1, s2);
+        hallService.declarePrivateSticks(room, request.getS1(), request.getS2());
 
         // 찬미 Map.of-> HashMap으로 변경
         Map<String, Object> result = new java.util.HashMap<>();
@@ -91,12 +90,10 @@ public class HallController {
     }
 
     @PostMapping("/challenge")
-    public Object challenge(
-            @RequestParam String roomId,
-            @RequestParam String playerId) {
-        GameRoom room = roomService.requireRoom(roomId);
+    public Object challenge(@RequestBody TurnActionRequest request) {
+        GameRoom room = roomService.requireRoom(request.getRoomId());
 
-        if (turnService.isTurnPlayer(room, playerId)) {
+        if (turnService.isTurnPlayer(room, request.getPlayerId())) {
             return "Turn player cannot challenge";
         }
 
@@ -109,12 +106,12 @@ public class HallController {
             return "Not in CHALLENGE phase.";
         }
 
-        return hallService.challenge(room, playerId);
+        return hallService.challenge(room, request.getPlayerId());
     }
 
     @PostMapping("/judge")
-    public Object judge(@RequestParam String roomId) {
-        GameRoom room = roomService.requireRoom(roomId);
+    public Object judge(@RequestBody RoomRequest request) {
+        GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (room.getCurrentYutResult() == null) {
             return "No yut result yet.";

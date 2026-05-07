@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.mse.service.PrivateService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
+import com.example.mse.dto.TurnActionRequest;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Scene;
 
@@ -25,15 +26,13 @@ public class PrivateController {
     private RoomService roomService;
 
     @PostMapping("/result")
-    public Object getPrivateResult(
-            @RequestParam String roomId,
-            @RequestParam String playerId) {
-        GameRoom room = roomService.requireRoom(roomId);
+    public Object getPrivateResult(@RequestBody TurnActionRequest request) {
+        GameRoom room = roomService.requireRoom(request.getRoomId());
 
-        if (!turnService.isTurnPlayer(room, playerId)) {
+        if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
             return "Not your turn.";
 
-        // 찬미 현재 턴 플레이어가 PRIVATE_ROOM에 있을 때만 윷 던지기 가능하도록 확인
+            // 찬미 현재 턴 플레이어가 PRIVATE_ROOM에 있을 때만 윷 던지기 가능하도록 확인
         }
         if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.PRIVATE_ROOM) {
             return "Not in PRIVATE_ROOM.";
@@ -43,12 +42,11 @@ public class PrivateController {
     }
 
     @PostMapping("/exit")
-    public String exitPrivate(
-            @RequestParam String roomId,
-            @RequestParam String playerId) {
-        GameRoom room = roomService.requireRoom(roomId);
+    public Object exitPrivate(
+            @RequestBody TurnActionRequest request) {
+        GameRoom room = roomService.requireRoom(request.getRoomId());
 
-        if (!turnService.isTurnPlayer(room, playerId)) {
+        if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
             return "Not your turn.";
         }
 
