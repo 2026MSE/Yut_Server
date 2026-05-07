@@ -1,9 +1,12 @@
+//찬미 말이동결과 enum으로 변경
 package com.example.mse.service;
 
 import com.example.mse.model.Board;
 import com.example.mse.model.BoardNode;
 import com.example.mse.model.Piece;
+import com.example.mse.model.MoveType;
 import org.springframework.stereotype.Service;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -151,7 +154,7 @@ public class BoardService {
         return currentPos;
     }
 
-    public String movePieceAndCheckCatch(Board board, Piece movingPiece, int targetPos){
+    public MoveType movePieceAndCheckCatch(Board board, Piece movingPiece, int targetPos){
         int oldPos = movingPiece.getCurrentPosition();
 
         if(oldPos != -1 && oldPos != 99){
@@ -166,7 +169,7 @@ public class BoardService {
             for(Piece carried : movingPiece.getCarriedPieces()){
                 carried.setCurrentPosition(99);
             }
-            return "FINISH";
+            return MoveType.FINISH;
         }
 
         List<Piece> targetPieces = board.getNodePiecesMap()
@@ -175,7 +178,7 @@ public class BoardService {
         if(targetPieces.isEmpty()){
             movingPiece.setCurrentPosition(targetPos);
             targetPieces.add(movingPiece);
-            return "NORMAL";
+            return MoveType.NORMAL;
         }
 
         Piece targetPiece = targetPieces.get(0);
@@ -187,7 +190,7 @@ public class BoardService {
             targetPiece.getCarriedPieces().addAll(movingPiece.getCarriedPieces());
             movingPiece.getCarriedPieces().clear();
 
-            return "PIGGYBACK";
+            return MoveType.PIGGYBACK;
         }
     else{
         targetPiece.setCurrentPosition(-1);
@@ -200,7 +203,7 @@ public class BoardService {
         movingPiece.setCurrentPosition(targetPos);
         targetPieces.add(movingPiece);
 
-        return "CATCH";
+        return MoveType.CATCH;
     }
     }
 }
