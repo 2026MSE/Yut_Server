@@ -7,8 +7,8 @@ import com.example.mse.service.PrivateService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
 import com.example.mse.dto.ApiResponse;
-import com.example.mse.dto.PlayerActionRequest;
-import com.example.mse.dto.PrivateInfoResponse;
+import com.example.mse.dto.GameActionRequest;
+import com.example.mse.dto.ThrowResponse;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Scene;
 
@@ -28,7 +28,7 @@ public class PrivateController {
     private RoomService roomService;
 
     @PostMapping("/result")
-    public Object getPrivateResult(@RequestBody PlayerActionRequest request) {
+    public Object getPrivateResult(@RequestBody GameActionRequest request) {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
@@ -40,12 +40,14 @@ public class PrivateController {
             return ApiResponse.fail("Not in PRIVATE_ROOM.");
         }
 
-        return privateService.getResult(room);
+        return ApiResponse.ok(
+                "Yut thrown successfully.",
+                privateService.getThrowResponse(room));
     }
 
     @PostMapping("/exit")
     public Object exitPrivate(
-            @RequestBody PlayerActionRequest request) {
+            @RequestBody GameActionRequest request) {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
@@ -76,7 +78,7 @@ public class PrivateController {
             return ApiResponse.fail("Not your turn.");
         }
         // 찬미 Map.of-> HashMap으로 변경 -> dto로 변경
-        PrivateInfoResponse response = new PrivateInfoResponse();
+        ThrowResponse response = new ThrowResponse();
 
         response.setSticks(room.getSticks());
         response.setPrivateSticks(room.getPrivateSticks());
@@ -85,6 +87,6 @@ public class PrivateController {
 
         return ApiResponse.ok(
                 "Private info loaded.",
-                response);
+                privateService.getThrowResponse(room));
     }
 }

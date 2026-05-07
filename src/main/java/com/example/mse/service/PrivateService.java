@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.springframework.stereotype.Service;
 
+import com.example.mse.dto.ThrowResponse;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.YutName;
@@ -126,4 +127,17 @@ public class PrivateService {
         room.setPrivateSticks(new StickSide[2]);
         room.setPublicSticks(new StickSide[2]);
     }
+
+    // 찬미 ThrowResponse 메서드 추가
+    public ThrowResponse getThrowResponse(GameRoom room) {
+    YutResult yutResult = getResult(room);
+
+    ThrowResponse response = new ThrowResponse();
+    response.setSticks(room.getSticks());
+    response.setPrivateSticks(room.getPrivateSticks());
+    response.setPublicSticks(room.getPublicSticks());
+    response.setYutResult(yutResult);
+
+    return response;
+}
 }

@@ -17,7 +17,7 @@ import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.MoveRequest;
-import com.example.mse.dto.PlayerActionRequest;
+import com.example.mse.dto.GameActionRequest;
 import com.example.mse.dto.MoveResponse;
 
 @RestController
@@ -40,7 +40,7 @@ public class YutController {
 
     @PostMapping("/end")
     public Object endTurn(
-            @RequestBody PlayerActionRequest request) {
+            @RequestBody GameActionRequest request) {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
@@ -139,7 +139,7 @@ public class YutController {
 
     @PostMapping("/throw")
     public Object throwAgain(
-            @RequestBody PlayerActionRequest request) {
+            @RequestBody GameActionRequest request) {
 
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
@@ -155,6 +155,8 @@ public class YutController {
             return ApiResponse.fail("Already thrown.");
         }
 
-        return privateService.getResult(room);
+        return ApiResponse.ok(
+                "Yut thrown again.",
+                privateService.getThrowResponse(room));
     }
 }

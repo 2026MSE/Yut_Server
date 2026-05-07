@@ -8,12 +8,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PrivateInfoResponse {
+public class ThrowResponse {
 
     private StickSide[] sticks;
-
     private StickSide[] privateSticks;
     private StickSide[] publicSticks;
 
-    private YutResult result;
+    private YutResult yutResult;
 }
