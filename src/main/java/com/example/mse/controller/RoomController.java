@@ -1,12 +1,15 @@
 package com.example.mse.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.mse.dto.PlayerInfo;
 import com.example.mse.dto.RoomInfo;
 import com.example.mse.model.GameRoom;
+import com.example.mse.service.PlayerService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
 
@@ -21,6 +24,9 @@ public class RoomController {
 
     @Autowired
     private TurnService turnService;
+
+    @Autowired
+    private PlayerService playerService;
 
     // 찬미 RoomInfo 관련 코드 수정
     @GetMapping("/create")
@@ -59,5 +65,12 @@ public class RoomController {
         GameRoom room = roomService.startRoom(roomId);
         turnService.startGame(room);
         return roomService.toRoomInfo(room);
+    }
+    
+    //찬미 플레이어 정보 확인 endpoint 추가
+    @GetMapping("/players")
+    public List<PlayerInfo> getRoomPlayers(@RequestParam String roomId) {
+        GameRoom room = roomService.requireRoom(roomId);
+        return playerService.getPlayerInfoByIds(room.getPlayerIds());
     }
 }
