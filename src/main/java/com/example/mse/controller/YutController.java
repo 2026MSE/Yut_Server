@@ -20,7 +20,7 @@ import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.MoveRequest;
-import com.example.mse.dto.TurnActionRequest;
+import com.example.mse.dto.PlayerActionRequest;
 
 @RestController
 @RequestMapping("/yut")
@@ -42,7 +42,7 @@ public class YutController {
 
     @PostMapping("/end")
     public Object endTurn(
-            @RequestBody TurnActionRequest request) {
+            @RequestBody PlayerActionRequest request) {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
@@ -142,7 +142,7 @@ public class YutController {
 
     @PostMapping("/throw")
     public Object throwAgain(
-            @RequestBody TurnActionRequest request) {
+            @RequestBody PlayerActionRequest request) {
 
         GameRoom room = roomService.requireRoom(request.getRoomId());
 

@@ -5,9 +5,10 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.DeclareRequest;
 import com.example.mse.dto.RoomRequest;
-import com.example.mse.dto.TurnActionRequest;
+import com.example.mse.dto.PlayerActionRequest;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.HallState;
 import com.example.mse.model.Scene;
@@ -56,24 +57,24 @@ public class HallController {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
-            return "Not your turn.";
+            return ApiResponse.fail("Not your turn.");
         }
 
         // 선언은 MAIN_HALL + DECLARE 상태에서만 가능하도록 확인
         if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.MAIN_HALL) {
-            return "Not in MAIN_HALL.";
+            return ApiResponse.fail("Not in MAIN_HALL.");
         }
 
         if (room.getHallState() != HallState.DECLARE) {
-            return "Not in DECLARE phase.";
+            return ApiResponse.fail("Not in DECLARE phase.");
         }
 
         if (request.getS1() == StickSide.TAIL) {
-            return "Invalid declaration: first private stick cannot be TAIL.";
+            return ApiResponse.fail("Invalid declaration: first private stick cannot be TAIL.");
         }
 
         if (request.getS2() == StickSide.BACK) {
-            return "Invalid declaration: second private stick cannot be BACK.";
+            return ApiResponse.fail("Invalid declaration: second private stick cannot be BACK.");
         }
 
         hallService.declarePrivateSticks(room, request.getS1(), request.getS2());
@@ -90,20 +91,20 @@ public class HallController {
     }
 
     @PostMapping("/challenge")
-    public Object challenge(@RequestBody TurnActionRequest request) {
+    public Object challenge(@RequestBody PlayerActionRequest request) {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (turnService.isTurnPlayer(room, request.getPlayerId())) {
-            return "Turn player cannot challenge";
+            return ApiResponse.fail("Turn player cannot challenge");
         }
 
         // 도전은 MAIN_HALL + CHALLENGE 상태에서만 가능하도록 확인
         if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.MAIN_HALL) {
-            return "Not in MAIN_HALL.";
+            return ApiResponse.fail("Not in MAIN_HALL.");
         }
 
         if (room.getHallState() != HallState.CHALLENGE) {
-            return "Not in CHALLENGE phase.";
+            return ApiResponse.fail("Not in CHALLENGE phase.");
         }
 
         return hallService.challenge(room, request.getPlayerId());
@@ -114,16 +115,16 @@ public class HallController {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (room.getCurrentYutResult() == null) {
-            return "No yut result yet.";
+            return ApiResponse.fail("No yut result yet.");
         }
 
         // 판정은 MAIN_HALL + CHALLENGE 상태에서만 가능하도록 확인
         if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.MAIN_HALL) {
-            return "Not in MAIN_HALL.";
+            return ApiResponse.fail("Not in MAIN_HALL.");
         }
 
         if (room.getHallState() != HallState.CHALLENGE) {
-            return "Not in CHALLENGE phase.";
+            return ApiResponse.fail("Not in CHALLENGE phase.");
         }
 
         String judgeResult = hallService.judgeChallenge(room);

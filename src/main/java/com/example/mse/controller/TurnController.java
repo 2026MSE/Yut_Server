@@ -3,6 +3,7 @@ package com.example.mse.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.mse.dto.ApiResponse;
 import com.example.mse.model.GameRoom;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
@@ -26,7 +27,7 @@ public class TurnController {
         GameRoom room = roomService.requireRoom(roomId);
 
         if (!turnService.isTurnPlayer(room, playerId)) {
-            return "Not your turn.";
+            return ApiResponse.fail("Not your turn.");
         }
 
         turnService.nextTurn(room);

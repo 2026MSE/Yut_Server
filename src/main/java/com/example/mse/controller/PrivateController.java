@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import com.example.mse.service.PrivateService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
-import com.example.mse.dto.TurnActionRequest;
+import com.example.mse.dto.ApiResponse;
+import com.example.mse.dto.PlayerActionRequest;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Scene;
 
@@ -26,16 +27,16 @@ public class PrivateController {
     private RoomService roomService;
 
     @PostMapping("/result")
-    public Object getPrivateResult(@RequestBody TurnActionRequest request) {
+    public Object getPrivateResult(@RequestBody PlayerActionRequest request) {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
-            return "Not your turn.";
+            return ApiResponse.fail("Not your turn.");
 
             // 찬미 현재 턴 플레이어가 PRIVATE_ROOM에 있을 때만 윷 던지기 가능하도록 확인
         }
         if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.PRIVATE_ROOM) {
-            return "Not in PRIVATE_ROOM.";
+            return ApiResponse.fail("Not in PRIVATE_ROOM.");
         }
 
         return privateService.getResult(room);
@@ -43,25 +44,25 @@ public class PrivateController {
 
     @PostMapping("/exit")
     public Object exitPrivate(
-            @RequestBody TurnActionRequest request) {
+            @RequestBody PlayerActionRequest request) {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
-            return "Not your turn.";
+            return ApiResponse.fail("Not your turn.");
         }
 
         // 찬미 현재 턴 플레이어가 PRIVATE_ROOM에 있을 때만, 윷을 던진 후에만 퇴장 가능하도록 확인
         if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.PRIVATE_ROOM) {
-            return "Not in PRIVATE_ROOM.";
+            return ApiResponse.fail("Not in PRIVATE_ROOM.");
         }
 
         if (!room.isAlreadyThrown()) {
-            return "You must throw yut first.";
+            return ApiResponse.fail("You must throw yut first.");
         }
 
         turnService.moveCurrentTurnPlayerRoom(room, Scene.MAIN_HALL);
 
-        return "Moved to MAIN_HALL";
+        return ApiResponse.ok("Moved to MAIN_HALL",null);
     }
 
     @GetMapping("/info")
@@ -71,7 +72,7 @@ public class PrivateController {
         GameRoom room = roomService.requireRoom(roomId);
 
         if (!turnService.isTurnPlayer(room, playerId)) {
-            return "Not your turn.";
+            return ApiResponse.fail("Not your turn.");
         }
         // 찬미 Map.of-> HashMap으로 변경
         java.util.Map<String, Object> result = new java.util.HashMap<>();
