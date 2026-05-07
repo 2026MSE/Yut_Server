@@ -1,4 +1,4 @@
-//찬미 말이동결과 enum으로 변경
+//26.05.07 찬미 말 이동결과 enum으로 변경, 대기석(-1) 처리 추가
 package com.example.mse.service;
 
 import com.example.mse.model.Board;
@@ -184,10 +184,19 @@ public class BoardService {
         Piece targetPiece = targetPieces.get(0);
 
         if(targetPiece.getOwnerId().equals(movingPiece.getOwnerId())){
+            //이동한 말과 그 말이 업고 있던 말들의 위치를 targetPos로 업데이트 
             movingPiece.setCurrentPosition(targetPos);
 
+            //찬미 위치 갱신코드 추가
+            for(Piece carried : movingPiece.getCarriedPieces()){
+                carried.setCurrentPosition(targetPos);
+            }
+            
+            //targetPos에 있던 말과 그 말이 업고 있던 말들을 이동한 말이 업음
             targetPiece.getCarriedPieces().add(movingPiece);
             targetPiece.getCarriedPieces().addAll(movingPiece.getCarriedPieces());
+            
+            //이동한 말은 대표말이 아니므로 carriedPieces는 초기화
             movingPiece.getCarriedPieces().clear();
 
             return MoveType.PIGGYBACK;
