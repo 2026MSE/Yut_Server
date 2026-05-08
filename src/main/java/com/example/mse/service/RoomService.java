@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.example.mse.dto.RoomInfo;
 import com.example.mse.model.BoardNode;
@@ -60,9 +60,9 @@ public class RoomService {
     public GameRoom startRoom(String roomId) {
         GameRoom room = requireRoom(roomId);
 
-        if (room.getPlayerIds().size() < 2) {
-            throw new RuntimeException("Need at least 2 players");
-        }
+        // if (room.getPlayerIds().size() < 2) {
+        //     throw new RuntimeException("Need at least 2 players");
+        // }
 
         room.setStarted(true);
 
