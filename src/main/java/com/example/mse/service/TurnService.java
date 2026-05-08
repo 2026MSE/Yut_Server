@@ -33,7 +33,7 @@ public class TurnService {
         turnInfo.setTurnOrder(order);
         turnInfo.setCurrentTurnIndex(0);
         turnInfo.setCurrentTurnPlayerId(order.get(0));
-        turnInfo.setCurrentTurnPlayerRoom(Scene.PRIVATE_ROOM);
+        turnInfo.setCurrentTurnPlayerRoom(Scene.MAIN_HALL);
     }
 
     public void nextTurn(GameRoom room) {
