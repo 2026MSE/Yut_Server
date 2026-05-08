@@ -7,8 +7,10 @@ import com.example.mse.dto.GameActionRequest;
 import com.example.mse.dto.MoveRequest;
 import com.example.mse.dto.ThrowResponse;
 import com.example.mse.model.GameRoom;
+import com.example.mse.model.MoveType;
 import com.example.mse.model.Piece;
 import com.example.mse.model.Scene;
+import com.example.mse.model.StickSide;
 import com.example.mse.service.BoardService;
 import com.example.mse.service.PrivateService;
 import com.example.mse.service.RoomService;
@@ -16,8 +18,6 @@ import com.example.mse.service.TurnService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/board")
@@ -37,37 +37,68 @@ public class BoardController {
     private TurnService turnService;
 
     // 찬미 /board/move는 말을 이동시키는 버튼 역할만 하게 변경
+    // yut/move랑 통합, currentYutResult 기준으로 이동
     @PostMapping("/move")
-    public ApiResponse<Void> movePiece(@RequestBody MoveRequest moveRequest) {
+    public ApiResponse<Void> movePiece(@RequestBody MoveRequest request) {
 
-        GameRoom room = roomService.requireRoom(moveRequest.getRoomId());
+        GameRoom room = roomService.requireRoom(request.getRoomId());
 
-        List<Piece> playerPieces = room.getBoard().getPieces().get(moveRequest.getPlayerId());
-
-        if (playerPieces == null) {
-            return ApiResponse.fail("Can not find the Player.");
+        if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
+            return ApiResponse.fail("Not your turn.");
         }
 
-        Piece targetPiece = playerPieces.stream()
-                .filter(p -> p.getId().equals(moveRequest.getPieceId()))
-                .findFirst()
-                .orElse(null);
-
-        if (targetPiece == null) {
-            return ApiResponse.fail("Can not find the Piece to move.");
+        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.YUT_ROOM) {
+            return ApiResponse.fail("Not in YUT_ROOM.");
         }
 
-        int nextPos = boardService.calculateNextPath(
-                room.getBoard(),
-                targetPiece.getCurrentPosition(),
-                moveRequest.getMoveAmount());
+        if (room.isAlreadyMoved()) {
+            return ApiResponse.fail("Already moved this turn.");
+        }
 
-        boardService.movePieceAndCheckCatch(
-                room.getBoard(),
-                targetPiece,
-                nextPos);
+        if (room.getCurrentYutResult() == null) {
+            return ApiResponse.fail("No yut result.");
+        }
 
-        return ApiResponse.ok("complete to move", null);
+        Piece movingPiece = boardService.findPiece(
+                room.getBoard(),
+                request.getPlayerId(),
+                request.getPieceId());
+
+        if (movingPiece == null) {
+            return ApiResponse.fail("Piece not found.");
+        }
+
+        if (movingPiece.getCurrentPosition() == 99) {
+            return ApiResponse.fail("This piece already finished.");
+        }
+
+        int targetPos = boardService.calculateNextPath(
+                room.getBoard(),
+                movingPiece.getCurrentPosition(),
+                room.getCurrentYutResult().getMove());
+
+        MoveType moveType = boardService.movePieceAndCheckCatch(
+                room.getBoard(),
+                movingPiece,
+                targetPos);
+
+        boolean extraTurn = room.getCurrentYutResult().isExtraTurn()
+                || moveType == MoveType.CATCH;
+
+        if (extraTurn) {
+            room.setAlreadyThrown(false);
+            room.setAlreadyMoved(false);
+            room.setCurrentYutResult(null);
+
+            room.setSticks(new StickSide[4]);
+            room.setPrivateSticks(new StickSide[2]);
+            room.setPublicSticks(new StickSide[2]);
+            room.setDeclaredPrivateSticks(new StickSide[2]);
+        } else {
+            room.setAlreadyMoved(true);
+        }
+
+        return ApiResponse.ok("Piece moved.", null);
     }
 
     @GetMapping("/state")
@@ -126,5 +157,27 @@ public class BoardController {
         privateService.getThrowResponse(room);
 
         return ApiResponse.ok("Yut thrown.", null);
+    }
+
+    @PostMapping("/end")
+    public ApiResponse<Void> endTurn(@RequestBody GameActionRequest request) {
+
+        GameRoom room = roomService.requireRoom(request.getRoomId());
+
+        if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
+            return ApiResponse.fail("Not your turn.");
+        }
+
+        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.YUT_ROOM) {
+            return ApiResponse.fail("Not in YUT_ROOM.");
+        }
+
+        if (!room.isAlreadyMoved()) {
+            return ApiResponse.fail("You must move before ending turn.");
+        }
+
+        turnService.nextTurn(room);
+
+        return ApiResponse.ok("Turn ended.", null);
     }
 }
