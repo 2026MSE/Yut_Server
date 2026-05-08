@@ -1,13 +1,19 @@
+// 26.05.08 찬미 yutcontroller이랑 통합
 package com.example.mse.controller;
 
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.BoardStatusResponse;
+import com.example.mse.dto.GameActionRequest;
 import com.example.mse.dto.MoveRequest;
 import com.example.mse.dto.ThrowResponse;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Piece;
+import com.example.mse.model.Scene;
 import com.example.mse.service.BoardService;
+import com.example.mse.service.PrivateService;
 import com.example.mse.service.RoomService;
+import com.example.mse.service.TurnService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +29,12 @@ public class BoardController {
 
     @Autowired
     private RoomService roomService;
+
+    @Autowired
+    private PrivateService privateService;
+
+    @Autowired
+    private TurnService turnService;
 
     // 찬미 /board/move는 말을 이동시키는 버튼 역할만 하게 변경
     @PostMapping("/move")
@@ -93,4 +105,26 @@ public class BoardController {
         return ApiResponse.ok("Board state loaded.", status);
     }
 
+    @PostMapping("/throw")
+    public ApiResponse<Void> throwYut(@RequestBody GameActionRequest request) {
+
+        GameRoom room = roomService.requireRoom(request.getRoomId());
+
+        if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
+            return ApiResponse.fail("Not your turn.");
+        }
+
+        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.YUT_ROOM
+                && room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.PRIVATE_ROOM) {
+            return ApiResponse.fail("Not in throwable room.");
+        }
+
+        if (room.isAlreadyThrown()) {
+            return ApiResponse.fail("Already thrown.");
+        }
+
+        privateService.getThrowResponse(room);
+
+        return ApiResponse.ok("Yut thrown.", null);
+    }
 }
