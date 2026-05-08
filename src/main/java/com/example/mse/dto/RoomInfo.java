@@ -13,6 +13,7 @@ public class RoomInfo {
 
     private String roomId;
     private List<String> playerIds;
+
     private boolean started;
 
 }
