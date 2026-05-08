@@ -3,6 +3,7 @@ package com.example.mse.controller;
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.BoardStatusResponse;
 import com.example.mse.dto.MoveRequest;
+import com.example.mse.dto.ThrowResponse;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Piece;
 import com.example.mse.service.BoardService;
@@ -59,15 +60,37 @@ public class BoardController {
 
     @GetMapping("/state")
     public ApiResponse<BoardStatusResponse> getBoardState(@RequestParam String roomId) {
+
         GameRoom room = roomService.requireRoom(roomId);
 
-        if (room == null) {
-            return ApiResponse.fail("존재하지 않는 방입니다.");
-        }
+        BoardStatusResponse status = new BoardStatusResponse();
 
-        // 현재 윷판 상태만 담아서 응답
-        BoardStatusResponse status = new BoardStatusResponse(room.getBoard().getPieces());
-        return ApiResponse.ok("윷판 상태 조회 성공", status);
+        status.setAllPieces(room.getBoard().getPieces());
+
+        status.setExtraTurn(
+                room.getCurrentYutResult() != null &&
+                        room.getCurrentYutResult().isExtraTurn());
+
+        ThrowResponse throwResponse = new ThrowResponse();
+        throwResponse.setSticks(room.getSticks());
+        throwResponse.setPrivateSticks(room.getPrivateSticks());
+        throwResponse.setPublicSticks(room.getPublicSticks());
+        throwResponse.setYutResult(room.getCurrentYutResult());
+
+        status.setThrowResult(throwResponse);
+
+        status.setCurrentTurnPlayerId(
+                room.getTurnInfo().getCurrentTurnPlayerId());
+
+        status.setCurrentRoom(
+                room.getTurnInfo().getCurrentTurnPlayerRoom());
+
+        status.setAlreadyThrown(room.isAlreadyThrown());
+        status.setAlreadyMoved(room.isAlreadyMoved());
+
+        status.setHallState(room.getHallState());
+
+        return ApiResponse.ok("Board state loaded.", status);
     }
 
 }
