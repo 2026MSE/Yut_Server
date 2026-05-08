@@ -4,6 +4,8 @@ package com.example.mse.controller;
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.BoardStatusResponse;
 import com.example.mse.dto.GameActionRequest;
+import com.example.mse.dto.MoveListResponse;
+import com.example.mse.dto.MoveOption;
 import com.example.mse.dto.MoveRequest;
 import com.example.mse.dto.ThrowResponse;
 import com.example.mse.model.GameRoom;
@@ -15,6 +17,9 @@ import com.example.mse.service.BoardService;
 import com.example.mse.service.PrivateService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -179,5 +184,56 @@ public class BoardController {
         turnService.nextTurn(room);
 
         return ApiResponse.ok("Turn ended.", null);
+    }
+
+    @GetMapping("/moveList")
+    public ApiResponse<MoveListResponse> getMoveList(
+            @RequestParam String roomId,
+            @RequestParam String playerId) {
+
+        GameRoom room = roomService.requireRoom(roomId);
+
+        if (!turnService.isTurnPlayer(room, playerId)) {
+            return ApiResponse.fail("Not your turn.");
+        }
+
+        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.YUT_ROOM) {
+            return ApiResponse.fail("Not in YUT_ROOM.");
+        }
+
+        if (room.getCurrentYutResult() == null) {
+            return ApiResponse.fail("No yut result.");
+        }
+
+        List<Piece> pieces = room.getBoard().getPieces().get(playerId);
+
+        if (pieces == null) {
+            return ApiResponse.fail("Can not find the Player.");
+        }
+
+        List<MoveOption> options = new ArrayList<>();
+
+        for (Piece piece : pieces) {
+            if (piece.getCurrentPosition() == 99) {
+                continue;
+            }
+
+            int targetPosition = boardService.calculateNextPath(
+                    room.getBoard(),
+                    piece.getCurrentPosition(),
+                    room.getCurrentYutResult().getMove());
+
+            MoveOption option = new MoveOption(
+                    piece.getId(),
+                    piece.getCurrentPosition(),
+                    targetPosition,
+                    targetPosition == 99);
+
+            options.add(option);
+        }
+
+        MoveListResponse response = new MoveListResponse(options);
+
+        return ApiResponse.ok("Move list loaded.", response);
     }
 }
