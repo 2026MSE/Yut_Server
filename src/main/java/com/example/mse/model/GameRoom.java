@@ -19,6 +19,9 @@ public class GameRoom {
     //방에 들어온 플레이어 아이디 목록
     private List<String> playerIds = new ArrayList<>();
 
+    // 방장 아이디
+    private String hostId;
+
     private boolean started = false;
     // 턴 정보
     private TurnInfo turnInfo = new TurnInfo();

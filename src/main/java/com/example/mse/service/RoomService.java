@@ -2,7 +2,6 @@ package com.example.mse.service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,15 +19,37 @@ public class RoomService {
     @Autowired
     private BoardService boardService; // 지도를 그려주는 서비스
 
+    // 방 만든 사람이 방장
     public GameRoom createRoom(String playerId) {
         GameRoom room = new GameRoom();
 
-        room.setRoomId(UUID.randomUUID().toString());
+        room.setRoomId(generateRoomCode());
+        room.setHostId(playerId);
         room.getPlayerIds().add(playerId);
 
         rooms.put(room.getRoomId(), room);
 
         return room;
+    }
+
+    // 방 코드 간소화
+    private String generateRoomCode() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        String code;
+
+        do {
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < 5; i++) {
+                int index = (int) (Math.random() * chars.length());
+                sb.append(chars.charAt(index));
+            }
+
+            code = sb.toString();
+        } while (rooms.containsKey(code));
+
+        return code;
     }
 
     public GameRoom joinRoom(String roomId, String playerId) {
@@ -61,7 +82,7 @@ public class RoomService {
         GameRoom room = requireRoom(roomId);
 
         // if (room.getPlayerIds().size() < 2) {
-        //     throw new RuntimeException("Need at least 2 players");
+        // throw new RuntimeException("Need at least 2 players");
         // }
 
         room.setStarted(true);
@@ -93,10 +114,11 @@ public class RoomService {
         info.setRoomId(room.getRoomId());
         info.setPlayerIds(room.getPlayerIds());
         info.setStarted(room.isStarted());
-
+        info.setHostId(room.getHostId());
         return info;
     }
 
+    // 방 나가면 다음 사람이 자동 방장
     public GameRoom leaveRoom(String roomId, String playerId) {
         GameRoom room = requireRoom(roomId);
 
@@ -109,6 +131,10 @@ public class RoomService {
         if (room.getPlayerIds().isEmpty()) {
             rooms.remove(roomId);
             return room;
+        }
+
+        if (playerId.equals(room.getHostId())) {
+            room.setHostId(room.getPlayerIds().get(0));
         }
 
         return room;

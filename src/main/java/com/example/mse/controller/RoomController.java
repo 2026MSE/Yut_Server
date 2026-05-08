@@ -70,6 +70,13 @@ public class RoomController {
 
     @PostMapping("/start")
     public Object startRoom(@RequestBody GameActionRequest request) {
+
+        GameRoom roomBeforeStart = roomService.requireRoom(request.getRoomId());
+
+        if (!request.getPlayerId().equals(roomBeforeStart.getHostId())) {
+            return ApiResponse.fail("Only host can start the game.");
+        }
+
         GameRoom room = roomService.startRoom(request.getRoomId());
         turnService.startGame(room);
 
