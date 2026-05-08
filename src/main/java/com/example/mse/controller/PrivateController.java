@@ -7,7 +7,7 @@ import com.example.mse.service.PrivateService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
 import com.example.mse.dto.ApiResponse;
-import com.example.mse.dto.PlayerActionRequest;
+import com.example.mse.dto.GameActionRequest;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Scene;
 
@@ -27,7 +27,7 @@ public class PrivateController {
     private RoomService roomService;
 
     @PostMapping("/result")
-    public Object getPrivateResult(@RequestBody PlayerActionRequest request) {
+    public Object getPrivateResult(@RequestBody GameActionRequest request) {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
@@ -39,12 +39,14 @@ public class PrivateController {
             return ApiResponse.fail("Not in PRIVATE_ROOM.");
         }
 
-        return privateService.getResult(room);
+        return ApiResponse.ok(
+                "Yut thrown successfully.",
+                privateService.getThrowResponse(room));
     }
 
     @PostMapping("/exit")
     public Object exitPrivate(
-            @RequestBody PlayerActionRequest request) {
+            @RequestBody GameActionRequest request) {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
@@ -62,9 +64,10 @@ public class PrivateController {
 
         turnService.moveCurrentTurnPlayerRoom(room, Scene.MAIN_HALL);
 
-        return ApiResponse.ok("Moved to MAIN_HALL",null);
+        return ApiResponse.ok("Moved to MAIN_HALL", null);
     }
 
+    //찬미 불필요 데이터 삭제
     @GetMapping("/info")
     public Object privateInfo(
             @RequestParam String roomId,
@@ -74,14 +77,9 @@ public class PrivateController {
         if (!turnService.isTurnPlayer(room, playerId)) {
             return ApiResponse.fail("Not your turn.");
         }
-        // 찬미 Map.of-> HashMap으로 변경
-        java.util.Map<String, Object> result = new java.util.HashMap<>();
 
-        result.put("sticks", room.getSticks());
-        result.put("privateSticks", room.getPrivateSticks());
-        result.put("publicSticks", room.getPublicSticks());
-        result.put("result", room.getCurrentYutResult());
-
-        return result;
+        return ApiResponse.ok(
+                "Private info loaded.",
+                privateService.getThrowResponse(room));
     }
 }

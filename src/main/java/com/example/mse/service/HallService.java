@@ -39,10 +39,6 @@ public class HallService {
 
     public String judgeChallenge(GameRoom room) {
 
-        if (room.getFirstChallengerId() == null) {
-            return "No challenger";
-        }
-
         boolean truth = Arrays.equals(
                 room.getPrivateSticks(),
                 room.getDeclaredPrivateSticks()

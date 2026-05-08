@@ -41,7 +41,7 @@ public class PlayerController {
         String encodedSeed = URLEncoder.encode(seed, StandardCharsets.UTF_8);
         byte[] image = diceBearService.fetchAvatar(style, encodedSeed);
         return ResponseEntity.ok()
-                .contentType(MediaType.valueOf("image/svg+xml"))
+                .contentType(MediaType.IMAGE_PNG)
                 .body(image);
     }
 
@@ -65,6 +65,6 @@ public class PlayerController {
 
     @GetMapping("/players")
     public ResponseEntity<?> getAllPlayers() {
-    return ResponseEntity.ok(playerService.getAll());
-}
+        return ResponseEntity.ok(playerService.getAll());
+    }
 }
