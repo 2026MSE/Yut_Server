@@ -47,7 +47,7 @@ public class PrivateController {
         return ApiResponse.ok("Moved to MAIN_HALL", null);
     }
 
-    // 찬미 불필요 데이터 삭제
+    // 찬미 불필요 데이터 삭제, 조회만 가능하도록 변경
     @GetMapping("/info")
     public Object privateInfo(
             @RequestParam String roomId,

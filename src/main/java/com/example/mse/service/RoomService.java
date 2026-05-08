@@ -86,8 +86,8 @@ public class RoomService {
 
         return room;
     }
-    
-    //찬미 RoomInfo DTO로 변환하는 메서드 추가
+
+    // 찬미 RoomInfo DTO로 변환하는 메서드 추가
     public RoomInfo toRoomInfo(GameRoom room) {
         RoomInfo info = new RoomInfo();
         info.setRoomId(room.getRoomId());
@@ -95,6 +95,23 @@ public class RoomService {
         info.setStarted(room.isStarted());
 
         return info;
+    }
+
+    public GameRoom leaveRoom(String roomId, String playerId) {
+        GameRoom room = requireRoom(roomId);
+
+        if (room.isStarted()) {
+            throw new RuntimeException("Cannot leave after game started.");
+        }
+
+        room.getPlayerIds().remove(playerId);
+
+        if (room.getPlayerIds().isEmpty()) {
+            rooms.remove(roomId);
+            return room;
+        }
+
+        return room;
     }
 
 }

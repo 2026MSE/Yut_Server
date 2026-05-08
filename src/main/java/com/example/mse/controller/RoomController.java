@@ -84,4 +84,15 @@ public class RoomController {
         GameRoom room = roomService.requireRoom(roomId);
         return playerService.getPlayerInfoByIds(room.getPlayerIds());
     }
+
+    @PostMapping("/leave")
+    public Object leaveRoom(@RequestBody GameActionRequest request) {
+        GameRoom room = roomService.leaveRoom(
+                request.getRoomId(),
+                request.getPlayerId());
+
+        return ApiResponse.ok(
+                "Left room.",
+                roomService.toRoomInfo(room));
+    }
 }
