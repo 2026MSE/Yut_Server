@@ -44,7 +44,8 @@ public class PlayerService {
             info.setPlayerId(player.getId());
             info.setName(player.getName());
             info.setCurrentEmoticon("");
-
+            info.setProfileUrl(player.getProfileUrl());
+            
             result.add(info);
         }
 
