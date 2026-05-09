@@ -52,20 +52,27 @@ public class RoomController {
     }
 
     @GetMapping("/state")
-    public RoomInfo getRoomState(@RequestParam String roomId) {
+    public ApiResponse<RoomInfo> getRoomState(@RequestParam String roomId) {
+
         GameRoom room = roomService.requireRoom(roomId);
-        return roomService.toRoomInfo(room);
+
+        return ApiResponse.ok(
+                "Room state loaded.",
+                roomService.toRoomInfo(room));
     }
 
     @GetMapping("/all")
-    public Map<String, RoomInfo> getAllRooms() {
+    public ApiResponse<Map<String, RoomInfo>> getAllRooms() {
+
         Map<String, RoomInfo> result = new java.util.HashMap<>();
 
         for (Map.Entry<String, GameRoom> entry : roomService.getAllRooms().entrySet()) {
             result.put(entry.getKey(), roomService.toRoomInfo(entry.getValue()));
         }
 
-        return result;
+        return ApiResponse.ok(
+                "All rooms loaded.",
+                result);
     }
 
     @PostMapping("/start")
@@ -87,9 +94,14 @@ public class RoomController {
 
     // 찬미 플레이어 정보 확인 endpoint 추가
     @GetMapping("/players")
-    public List<PlayerInfo> getRoomPlayers(@RequestParam String roomId) {
+    public ApiResponse<List<PlayerInfo>> getRoomPlayers(
+            @RequestParam String roomId) {
+
         GameRoom room = roomService.requireRoom(roomId);
-        return playerService.getPlayerInfoByIds(room.getPlayerIds());
+
+        return ApiResponse.ok(
+                "Room players loaded.",
+                playerService.getPlayerInfoByIds(room.getPlayerIds()));
     }
 
     @PostMapping("/leave")

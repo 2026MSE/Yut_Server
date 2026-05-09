@@ -2,12 +2,14 @@ package com.example.mse.controller;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.mse.dto.ApiResponse;
 import com.example.mse.model.Player;
 import com.example.mse.service.DiceBearService;
 import com.example.mse.service.PlayerService;
@@ -26,11 +28,14 @@ public class PlayerController {
 
     // URL만 반환
     @GetMapping("/url")
-    public ResponseEntity<String> getAvatarUrl(
+    public ApiResponse<String> getAvatarUrl(
             @RequestParam(defaultValue = "adventurer") String style,
             @RequestParam String seed) {
+
         String encodedSeed = URLEncoder.encode(seed, StandardCharsets.UTF_8);
-        return ResponseEntity.ok(diceBearService.getAvatarUrl(style, encodedSeed));
+        String avatarUrl = diceBearService.getAvatarUrl(style, encodedSeed);
+
+        return ApiResponse.ok("Avatar URL loaded.", avatarUrl);
     }
 
     // 이미지 직접 프록시
@@ -47,9 +52,10 @@ public class PlayerController {
 
     // Player 객체로 아바타 프로필 생성
     @GetMapping("/player")
-    public ResponseEntity<Player> getPlayerWithAvatar(
+    public ApiResponse<Player> getPlayerWithAvatar(
             @RequestParam String name,
             @RequestParam(defaultValue = "adventurer") String style) {
+
         String encodedSeed = URLEncoder.encode(name, StandardCharsets.UTF_8);
         String avatarUrl = diceBearService.getAvatarUrl(style, encodedSeed);
 
@@ -60,11 +66,11 @@ public class PlayerController {
 
         playerService.save(player);
 
-        return ResponseEntity.ok(player);
+        return ApiResponse.ok("Player created.", player);
     }
 
     @GetMapping("/players")
-    public ResponseEntity<?> getAllPlayers() {
-        return ResponseEntity.ok(playerService.getAll());
+    public ApiResponse<Map<String, Player>> getAllPlayers() {
+        return ApiResponse.ok("All players loaded.", playerService.getAll());
     }
 }
