@@ -17,7 +17,7 @@ import com.example.mse.model.StickSide;
 public class TurnService {
 
     @Autowired
-    private PrivateService privateService;
+    private YutService privateService;
 
     public void startGame(GameRoom room) {
         List<String> order = new ArrayList<>(room.getPlayerIds());

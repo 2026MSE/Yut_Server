@@ -11,7 +11,7 @@ import com.example.mse.model.YutName;
 import com.example.mse.model.YutResult;
 
 @Service
-public class PrivateService {
+public class YutService {
 
     private Random random = new Random();
 

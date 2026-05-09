@@ -14,7 +14,7 @@ import com.example.mse.model.Piece;
 import com.example.mse.model.Scene;
 import com.example.mse.model.StickSide;
 import com.example.mse.service.BoardService;
-import com.example.mse.service.PrivateService;
+import com.example.mse.service.YutService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
 
@@ -36,7 +36,7 @@ public class BoardController {
     private RoomService roomService;
 
     @Autowired
-    private PrivateService privateService;
+    private YutService privateService;
 
     @Autowired
     private TurnService turnService;
