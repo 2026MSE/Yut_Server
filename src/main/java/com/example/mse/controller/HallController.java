@@ -90,6 +90,8 @@ public class HallController {
         response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
         response.setPublicSticks(room.getPublicSticks());
         response.setState(room.getHallState());
+        
+        turnService.moveCurrentTurnPlayerRoom(room, Scene.YUT_ROOM);
 
         return ApiResponse.ok("Declared private sticks.", response);
     }
