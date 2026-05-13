@@ -1,3 +1,4 @@
+// 26.05.13 TurnPhase 기반으로 변경
 package com.example.mse.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,9 @@ import com.example.mse.dto.DeclareResponse;
 import com.example.mse.dto.HallInfoResponse;
 import com.example.mse.dto.GameActionRequest;
 import com.example.mse.model.GameRoom;
-import com.example.mse.model.HallState;
 import com.example.mse.model.Scene;
 import com.example.mse.model.StickSide;
+import com.example.mse.model.TurnPhase;
 import com.example.mse.service.HallService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
@@ -64,13 +65,8 @@ public class HallController {
             return ApiResponse.fail("Not your turn.");
         }
 
-        // 선언은 MAIN_HALL + DECLARE 상태에서만 가능하도록 확인
-        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.MAIN_HALL) {
-            return ApiResponse.fail("Not in MAIN_HALL.");
-        }
-
-        if (room.getHallState() != HallState.DECLARE) {
-            return ApiResponse.fail("Not in DECLARE phase.");
+        if (room.getTurnPhase() != TurnPhase.MAIN_HALL_DECLARE) {
+            return ApiResponse.fail("Not in MAIN_HALL_DECLARE phase.");
         }
 
         if (request.getS1() == StickSide.TAIL) {
@@ -83,37 +79,34 @@ public class HallController {
 
         hallService.declarePrivateSticks(room, request.getS1(), request.getS2());
 
-        // 찬미 Map.of-> HashMap으로 변경 -> dto로 변경
+        room.setTurnPhase(TurnPhase.MAIN_HALL_CHALLENGE);
+
         DeclareResponse response = new DeclareResponse();
 
         response.setMessage("Declared private sticks");
         response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
         response.setPublicSticks(room.getPublicSticks());
         response.setState(room.getHallState());
-        
-        turnService.moveCurrentTurnPlayerRoom(room, Scene.YUT_ROOM);
 
         return ApiResponse.ok("Declared private sticks.", response);
     }
 
     @PostMapping("/challenge")
     public Object challenge(@RequestBody GameActionRequest request) {
+
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (turnService.isTurnPlayer(room, request.getPlayerId())) {
             return ApiResponse.fail("Turn player cannot challenge");
         }
 
-        // 도전은 MAIN_HALL + CHALLENGE 상태에서만 가능하도록 확인
-        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.MAIN_HALL) {
-            return ApiResponse.fail("Not in MAIN_HALL.");
+        if (room.getTurnPhase() != TurnPhase.MAIN_HALL_CHALLENGE) {
+            return ApiResponse.fail("Not in MAIN_HALL_CHALLENGE phase.");
         }
 
-        if (room.getHallState() != HallState.CHALLENGE) {
-            return ApiResponse.fail("Not in CHALLENGE phase.");
-        }
+        String result = hallService.challenge(room, request.getPlayerId());
 
-        return hallService.challenge(room, request.getPlayerId());
+        return ApiResponse.ok(result, null);
     }
 
     @PostMapping("/judge")
@@ -124,15 +117,6 @@ public class HallController {
             return ApiResponse.fail("No yut result yet.");
         }
 
-        // 판정은 MAIN_HALL + CHALLENGE 상태에서만 가능하도록 확인
-        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.MAIN_HALL) {
-            return ApiResponse.fail("Not in MAIN_HALL.");
-        }
-
-        if (room.getHallState() != HallState.CHALLENGE) {
-            return ApiResponse.fail("Not in CHALLENGE phase.");
-        }
-
         // 찬미 도전자가 없으면 판정 불가하도록 확인
         if (room.getFirstChallengerId() == null) {
             return ApiResponse.fail("No challenger.");
@@ -141,6 +125,8 @@ public class HallController {
         String judgeResult = hallService.judgeChallenge(room);
 
         turnService.moveCurrentTurnPlayerRoom(room, Scene.YUT_ROOM);
+
+        room.setTurnPhase(TurnPhase.YUT_MOVE);
 
         // 찬미 Map.of-> HashMap으로 변경 -> JudgeResponse DTO로 변경
         JudgeResponse response = new JudgeResponse();
