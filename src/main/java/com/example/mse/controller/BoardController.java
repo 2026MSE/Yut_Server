@@ -1,4 +1,5 @@
 // 26.05.08 찬미 yutcontroller이랑 통합
+// 26.05.13 TurnPhase 기반으로 변경
 package com.example.mse.controller;
 
 import com.example.mse.dto.ApiResponse;
@@ -53,8 +54,8 @@ public class BoardController {
             return ApiResponse.fail("Not your turn.");
         }
 
-        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.YUT_ROOM) {
-            return ApiResponse.fail("Not in YUT_ROOM.");
+        if (room.getTurnPhase() != TurnPhase.YUT_MOVE) {
+            return ApiResponse.fail("Not in YUT_MOVE phase.");
         }
 
         if (room.isAlreadyMoved()) {
@@ -171,13 +172,15 @@ public class BoardController {
             return ApiResponse.fail("Not your turn.");
         }
 
-        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.YUT_ROOM) {
-            return ApiResponse.fail("Not in YUT_ROOM.");
+        if (room.getTurnPhase() != TurnPhase.YUT_MOVE) {
+            return ApiResponse.fail("Not in YUT_MOVE phase.");
         }
 
         if (!room.isAlreadyMoved()) {
             return ApiResponse.fail("You must move before ending turn.");
         }
+
+        room.setTurnPhase(TurnPhase.TURN_END);
 
         turnService.nextTurn(room);
 
@@ -195,8 +198,8 @@ public class BoardController {
             return ApiResponse.fail("Not your turn.");
         }
 
-        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.YUT_ROOM) {
-            return ApiResponse.fail("Not in YUT_ROOM.");
+        if (room.getTurnPhase() != TurnPhase.YUT_MOVE) {
+            return ApiResponse.fail("Not in YUT_MOVE phase.");
         }
 
         if (room.getCurrentYutResult() == null) {
