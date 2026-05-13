@@ -12,6 +12,7 @@ import com.example.mse.model.GameRoom;
 import com.example.mse.model.HallState;
 import com.example.mse.model.Scene;
 import com.example.mse.model.StickSide;
+import com.example.mse.model.TurnPhase;
 
 @Service
 public class TurnService {
@@ -34,6 +35,8 @@ public class TurnService {
         turnInfo.setCurrentTurnIndex(0);
         turnInfo.setCurrentTurnPlayerId(order.get(0));
         turnInfo.setCurrentTurnPlayerRoom(Scene.PRIVATE_ROOM);
+        
+        room.setTurnPhase(TurnPhase.PRIVATE_THROW);
     }
 
     public void nextTurn(GameRoom room) {

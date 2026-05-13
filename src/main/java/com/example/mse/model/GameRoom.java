@@ -25,6 +25,8 @@ public class GameRoom {
     private boolean started = false;
     // 턴 정보
     private TurnInfo turnInfo = new TurnInfo();
+    // 턴 단계 대기
+    private TurnPhase turnPhase = TurnPhase.WAITING;
     // 홀 상태
     private HallState hallState = HallState.DECLARE;
     // 현재 윷 결과

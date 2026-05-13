@@ -13,6 +13,7 @@ import com.example.mse.model.MoveType;
 import com.example.mse.model.Piece;
 import com.example.mse.model.Scene;
 import com.example.mse.model.StickSide;
+import com.example.mse.model.TurnPhase;
 import com.example.mse.service.BoardService;
 import com.example.mse.service.YutService;
 import com.example.mse.service.RoomService;
@@ -150,16 +151,13 @@ public class BoardController {
             return ApiResponse.fail("Not your turn.");
         }
 
-        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.YUT_ROOM
-                && room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.PRIVATE_ROOM) {
-            return ApiResponse.fail("Not in throwable room.");
-        }
-
-        if (room.isAlreadyThrown()) {
-            return ApiResponse.fail("Already thrown.");
+        if (room.getTurnPhase() != TurnPhase.PRIVATE_THROW) {
+            return ApiResponse.fail("Not in PRIVATE_THROW phase.");
         }
 
         privateService.getThrowResponse(room);
+
+        room.setTurnPhase(TurnPhase.MAIN_HALL_DECLARE);
 
         return ApiResponse.ok("Yut thrown.", null);
     }
