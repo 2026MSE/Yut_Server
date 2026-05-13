@@ -51,16 +51,6 @@ public class RoomController {
                 roomService.toRoomInfo(room));
     }
 
-    @GetMapping("/state")
-    public ApiResponse<RoomInfo> getRoomState(@RequestParam String roomId) {
-
-        GameRoom room = roomService.requireRoom(roomId);
-
-        return ApiResponse.ok(
-                "Room state loaded.",
-                roomService.toRoomInfo(room));
-    }
-
     @GetMapping("/all")
     public ApiResponse<Map<String, RoomInfo>> getAllRooms() {
 

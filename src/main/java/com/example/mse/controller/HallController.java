@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.DeclareRequest;
 import com.example.mse.dto.DeclareResponse;
-import com.example.mse.dto.HallInfoResponse;
 import com.example.mse.dto.GameActionRequest;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Scene;
@@ -31,22 +30,6 @@ public class HallController {
 
     @Autowired
     private RoomService roomService;
-
-    // 찬미 dto로 변경
-    @GetMapping("/info")
-    public Object info(@RequestParam String roomId) {
-        GameRoom room = roomService.requireRoom(roomId);
-
-        HallInfoResponse response = new HallInfoResponse();
-
-        response.setTurnPhase(room.getTurnPhase());
-        response.setPublicSticks(room.getPublicSticks());
-        response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
-        response.setFirstChallenger(room.getFirstChallengerId());
-        response.setQueue(room.getChallengeQueue());
-
-        return ApiResponse.ok("Hall info loaded.", response);
-    }
 
     @PostMapping("/declare")
     public Object declare(@RequestBody DeclareRequest request) {

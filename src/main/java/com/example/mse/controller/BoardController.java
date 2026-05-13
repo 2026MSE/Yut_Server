@@ -3,12 +3,10 @@
 package com.example.mse.controller;
 
 import com.example.mse.dto.ApiResponse;
-import com.example.mse.dto.BoardStatusResponse;
 import com.example.mse.dto.GameActionRequest;
 import com.example.mse.dto.MoveListResponse;
 import com.example.mse.dto.MoveOption;
 import com.example.mse.dto.MoveRequest;
-import com.example.mse.dto.ThrowResponse;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.MoveType;
 import com.example.mse.model.Piece;
@@ -103,38 +101,6 @@ public class BoardController {
         }
 
         return ApiResponse.ok("Piece moved.", null);
-    }
-
-    @GetMapping("/state")
-    public ApiResponse<BoardStatusResponse> getBoardState(@RequestParam String roomId) {
-
-        GameRoom room = roomService.requireRoom(roomId);
-
-        BoardStatusResponse status = new BoardStatusResponse();
-
-        status.setAllPieces(room.getBoard().getPieces());
-
-        status.setExtraTurn(
-                room.getCurrentYutResult() != null &&
-                        room.getCurrentYutResult().isExtraTurn());
-
-        ThrowResponse throwResponse = new ThrowResponse();
-        throwResponse.setSticks(room.getSticks());
-        throwResponse.setPrivateSticks(room.getPrivateSticks());
-        throwResponse.setPublicSticks(room.getPublicSticks());
-        throwResponse.setYutResult(room.getCurrentYutResult());
-
-        status.setThrowResult(throwResponse);
-
-        status.setCurrentTurnPlayerId(
-                room.getTurnInfo().getCurrentTurnPlayerId());
-
-        status.setCurrentRoom(
-                room.getTurnInfo().getCurrentTurnPlayerRoom());
-
-        status.setTurnPhase(room.getTurnPhase());
-
-        return ApiResponse.ok("Board state loaded.", status);
     }
 
     @PostMapping("/throw")

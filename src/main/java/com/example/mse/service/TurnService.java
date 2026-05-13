@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.mse.dto.TurnInfo;
 import com.example.mse.model.GameRoom;
-import com.example.mse.model.HallState;
 import com.example.mse.model.Scene;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
