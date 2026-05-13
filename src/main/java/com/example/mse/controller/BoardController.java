@@ -3,7 +3,6 @@
 package com.example.mse.controller;
 
 import com.example.mse.dto.ApiResponse;
-import com.example.mse.dto.GameActionRequest;
 import com.example.mse.dto.MoveListResponse;
 import com.example.mse.dto.MoveOption;
 import com.example.mse.dto.MoveRequest;
@@ -13,7 +12,6 @@ import com.example.mse.model.Piece;
 import com.example.mse.model.TurnPhase;
 import com.example.mse.service.BoardService;
 import com.example.mse.service.GameFlowService;
-import com.example.mse.service.YutService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
 
@@ -33,9 +31,6 @@ public class BoardController {
 
     @Autowired
     private RoomService roomService;
-
-    @Autowired
-    private YutService privateService;
 
     @Autowired
     private TurnService turnService;
@@ -91,43 +86,6 @@ public class BoardController {
         gameFlowService.handleMoveResult(room, extraTurn);
 
         return ApiResponse.ok("Piece moved.", null);
-    }
-
-    @PostMapping("/throw")
-    public ApiResponse<Void> throwYut(@RequestBody GameActionRequest request) {
-
-        GameRoom room = roomService.requireRoom(request.getRoomId());
-
-        if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
-            return ApiResponse.fail("Not your turn.");
-        }
-
-        if (room.getTurnPhase() != TurnPhase.PRIVATE_THROW) {
-            return ApiResponse.fail("Not in PRIVATE_THROW phase.");
-        }
-
-        privateService.getThrowResponse(room);
-        gameFlowService.startDeclarePhase(room);
-
-        return ApiResponse.ok("Yut thrown.", null);
-    }
-
-    @PostMapping("/end")
-    public ApiResponse<Void> endTurn(@RequestBody GameActionRequest request) {
-
-        GameRoom room = roomService.requireRoom(request.getRoomId());
-
-        if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
-            return ApiResponse.fail("Not your turn.");
-        }
-
-        if (room.getTurnPhase() != TurnPhase.YUT_MOVE_DONE) {
-            return ApiResponse.fail("You must move before ending turn.");
-        }
-
-        gameFlowService.endTurn(room);
-
-        return ApiResponse.ok("Turn ended.", null);
     }
 
     @GetMapping("/moveList")
