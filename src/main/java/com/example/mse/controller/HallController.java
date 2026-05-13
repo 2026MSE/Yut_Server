@@ -12,6 +12,7 @@ import com.example.mse.model.GameRoom;
 import com.example.mse.model.Scene;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
+import com.example.mse.service.GameFlowService;
 import com.example.mse.service.HallService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
@@ -30,6 +31,9 @@ public class HallController {
 
     @Autowired
     private RoomService roomService;
+
+    @Autowired
+    private GameFlowService gameFlowService;
 
     @PostMapping("/declare")
     public Object declare(@RequestBody DeclareRequest request) {
@@ -53,7 +57,7 @@ public class HallController {
 
         hallService.declarePrivateSticks(room, request.getS1(), request.getS2());
 
-        room.setTurnPhase(TurnPhase.MAIN_HALL_CHALLENGE);
+        gameFlowService.startChallengePhase(room);
 
         DeclareResponse response = new DeclareResponse();
 
@@ -99,7 +103,7 @@ public class HallController {
 
         turnService.moveCurrentTurnPlayerRoom(room, Scene.YUT_ROOM);
 
-        room.setTurnPhase(TurnPhase.YUT_MOVE);
+        gameFlowService.startMovePhase(room);
 
         // 찬미 Map.of-> HashMap으로 변경 -> JudgeResponse DTO로 변경
         JudgeResponse response = new JudgeResponse();

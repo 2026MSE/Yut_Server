@@ -13,6 +13,7 @@ import com.example.mse.model.Piece;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
 import com.example.mse.service.BoardService;
+import com.example.mse.service.GameFlowService;
 import com.example.mse.service.YutService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
@@ -39,6 +40,9 @@ public class BoardController {
 
     @Autowired
     private TurnService turnService;
+
+    @Autowired
+    private GameFlowService gameFlowService;
 
     // 찬미 /board/move는 말을 이동시키는 버튼 역할만 하게 변경
     // yut/move랑 통합, currentYutResult 기준으로 이동
@@ -85,20 +89,7 @@ public class BoardController {
         boolean extraTurn = room.getCurrentYutResult().isExtraTurn()
                 || moveType == MoveType.CATCH;
 
-        if (extraTurn) {
-
-            room.setTurnPhase(TurnPhase.PRIVATE_THROW);
-            room.setCurrentYutResult(null);
-
-            room.setSticks(new StickSide[4]);
-            room.setPrivateSticks(new StickSide[2]);
-            room.setPublicSticks(new StickSide[2]);
-            room.setDeclaredPrivateSticks(new StickSide[2]);
-
-        } else {
-
-            room.setTurnPhase(TurnPhase.YUT_MOVE_DONE);
-        }
+        gameFlowService.handleMoveResult(room, extraTurn);
 
         return ApiResponse.ok("Piece moved.", null);
     }
@@ -117,8 +108,7 @@ public class BoardController {
         }
 
         privateService.getThrowResponse(room);
-
-        room.setTurnPhase(TurnPhase.MAIN_HALL_DECLARE);
+        gameFlowService.startDeclarePhase(room);
 
         return ApiResponse.ok("Yut thrown.", null);
     }
@@ -136,9 +126,7 @@ public class BoardController {
             return ApiResponse.fail("You must move before ending turn.");
         }
 
-        room.setTurnPhase(TurnPhase.TURN_END);
-
-        turnService.nextTurn(room);
+        gameFlowService.endTurn(room);
 
         return ApiResponse.ok("Turn ended.", null);
     }
