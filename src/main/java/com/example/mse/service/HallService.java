@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.springframework.stereotype.Service;
 
 import com.example.mse.model.GameRoom;
-import com.example.mse.model.HallState;
 import com.example.mse.model.StickSide;
 
 @Service
@@ -14,16 +13,11 @@ public class HallService {
     public void declarePrivateSticks(GameRoom room, StickSide s1, StickSide s2) {
         room.setDeclaredPrivateSticks(new StickSide[] { s1, s2 });
 
-        room.setHallState(HallState.CHALLENGE);
         room.setFirstChallengerId(null);
         room.getChallengeQueue().clear();
     }
 
     public String challenge(GameRoom room, String playerId) {
-
-        if (room.getHallState() != HallState.CHALLENGE) {
-            return "Not in challenge phase";
-        }
 
         if (!room.getChallengeQueue().contains(playerId)) {
             room.getChallengeQueue().add(playerId);

@@ -134,8 +134,6 @@ public class BoardController {
 
         status.setTurnPhase(room.getTurnPhase());
 
-        status.setHallState(room.getHallState());
-
         return ApiResponse.ok("Board state loaded.", status);
     }
 

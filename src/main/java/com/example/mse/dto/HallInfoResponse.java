@@ -2,8 +2,8 @@ package com.example.mse.dto;
 
 import java.util.List;
 
-import com.example.mse.model.HallState;
 import com.example.mse.model.StickSide;
+import com.example.mse.model.TurnPhase;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class HallInfoResponse {
 
-    private HallState state;
+    private TurnPhase turnPhase;
 
     private StickSide[] publicSticks;
     private StickSide[] declaredPrivateSticks;

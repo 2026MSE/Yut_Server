@@ -1,6 +1,5 @@
 package com.example.mse.dto;
 
-import com.example.mse.model.HallState;
 import com.example.mse.model.Piece;
 import com.example.mse.model.Scene;
 import com.example.mse.model.TurnPhase;
@@ -23,8 +22,6 @@ public class BoardStatusResponse {
     private Scene currentRoom;
 
     private TurnPhase turnPhase;
-
-    private HallState hallState;
 
     public BoardStatusResponse() {
     }

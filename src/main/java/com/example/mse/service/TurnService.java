@@ -56,7 +56,6 @@ public class TurnService {
         // 찬미 초기화 부분 수정
         privateService.resetTurn(room);
 
-        room.setHallState(HallState.DECLARE);
         room.setDeclaredPrivateSticks(new StickSide[2]);
         room.setFirstChallengerId(null);
         room.getChallengeQueue().clear();

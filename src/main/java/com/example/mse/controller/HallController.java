@@ -32,15 +32,6 @@ public class HallController {
     @Autowired
     private RoomService roomService;
 
-    @GetMapping("/state")
-    public Object getState(@RequestParam String roomId) {
-        GameRoom room = roomService.requireRoom(roomId);
-
-        return ApiResponse.ok(
-                "Hall state loaded.",
-                room.getHallState());
-    }
-
     // 찬미 dto로 변경
     @GetMapping("/info")
     public Object info(@RequestParam String roomId) {
@@ -48,7 +39,7 @@ public class HallController {
 
         HallInfoResponse response = new HallInfoResponse();
 
-        response.setState(room.getHallState());
+        response.setTurnPhase(room.getTurnPhase());
         response.setPublicSticks(room.getPublicSticks());
         response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
         response.setFirstChallenger(room.getFirstChallengerId());
@@ -86,7 +77,6 @@ public class HallController {
         response.setMessage("Declared private sticks");
         response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
         response.setPublicSticks(room.getPublicSticks());
-        response.setState(room.getHallState());
 
         return ApiResponse.ok("Declared private sticks.", response);
     }
