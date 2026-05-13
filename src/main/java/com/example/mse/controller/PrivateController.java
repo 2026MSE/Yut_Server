@@ -1,3 +1,4 @@
+// 26.05.13 TurnPhase 기반으로 변경
 package com.example.mse.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import com.example.mse.dto.GameActionRequest;
 import com.example.mse.dto.ThrowResponse;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Scene;
+import com.example.mse.model.TurnPhase;
 
 @RestController
 @RequestMapping("/private")
@@ -25,20 +27,14 @@ public class PrivateController {
 
     // YutRoom으로 이동하기 위하여 유지
     @PostMapping("/exit")
-    public Object exitPrivate(
-            @RequestBody GameActionRequest request) {
+    public Object exitPrivate(@RequestBody GameActionRequest request) {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
             return ApiResponse.fail("Not your turn.");
         }
 
-        // 찬미 현재 턴 플레이어가 PRIVATE_ROOM에 있을 때만, 윷을 던진 후에만 퇴장 가능하도록 확인
-        if (room.getTurnInfo().getCurrentTurnPlayerRoom() != Scene.PRIVATE_ROOM) {
-            return ApiResponse.fail("Not in PRIVATE_ROOM.");
-        }
-
-        if (!room.isAlreadyThrown()) {
+        if (room.getTurnPhase() != TurnPhase.MAIN_HALL_DECLARE) {
             return ApiResponse.fail("You must throw yut first.");
         }
 
