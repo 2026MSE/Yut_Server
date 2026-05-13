@@ -1,9 +1,9 @@
-// 26.05.08 찬미 /board/move 반환값 없애는 대신 보드 상태 정보를 여기에 추가
 package com.example.mse.dto;
 
 import com.example.mse.model.HallState;
 import com.example.mse.model.Piece;
 import com.example.mse.model.Scene;
+import com.example.mse.model.TurnPhase;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,8 +22,7 @@ public class BoardStatusResponse {
     private String currentTurnPlayerId;
     private Scene currentRoom;
 
-    private boolean alreadyThrown;
-    private boolean alreadyMoved;
+    private TurnPhase turnPhase;
 
     private HallState hallState;
 

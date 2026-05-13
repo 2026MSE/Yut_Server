@@ -31,7 +31,6 @@ public class GameRoom {
     private HallState hallState = HallState.DECLARE;
     // 현재 윷 결과
     private YutResult currentYutResult;
-    private boolean alreadyThrown = false;
 
     //윷 정보
     private StickSide[] sticks = new StickSide[4];
@@ -45,6 +44,4 @@ public class GameRoom {
 
     // 영준 추가
     private Board board = new Board();
-    //찬미 한 턴에 한 번만 이동하도록 체크
-    private boolean alreadyMoved = false;
 }

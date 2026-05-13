@@ -17,10 +17,6 @@ public class YutService {
 
     public YutResult getResult(GameRoom room) {
 
-        if (room.isAlreadyThrown()) {
-            return room.getCurrentYutResult();
-        }
-
         StickSide[] sticks = generateSticks();
 
         room.setSticks(sticks);
@@ -38,7 +34,6 @@ public class YutService {
         YutResult result = calculateResult(sticks);
 
         room.setCurrentYutResult(result);
-        room.setAlreadyThrown(true);
 
         return result;
     }
@@ -120,8 +115,7 @@ public class YutService {
     }
 
     public void resetTurn(GameRoom room) {
-        room.setAlreadyThrown(false);
-        room.setAlreadyMoved(false);
+
         room.setCurrentYutResult(null);
         room.setSticks(new StickSide[4]);
         room.setPrivateSticks(new StickSide[2]);
@@ -130,14 +124,14 @@ public class YutService {
 
     // 찬미 ThrowResponse 메서드 추가
     public ThrowResponse getThrowResponse(GameRoom room) {
-    YutResult yutResult = getResult(room);
+        YutResult yutResult = getResult(room);
 
-    ThrowResponse response = new ThrowResponse();
-    response.setSticks(room.getSticks());
-    response.setPrivateSticks(room.getPrivateSticks());
-    response.setPublicSticks(room.getPublicSticks());
-    response.setYutResult(yutResult);
+        ThrowResponse response = new ThrowResponse();
+        response.setSticks(room.getSticks());
+        response.setPrivateSticks(room.getPrivateSticks());
+        response.setPublicSticks(room.getPublicSticks());
+        response.setYutResult(yutResult);
 
-    return response;
-}
+        return response;
+    }
 }

@@ -57,10 +57,6 @@ public class BoardController {
             return ApiResponse.fail("Not in YUT_MOVE phase.");
         }
 
-        if (room.isAlreadyMoved()) {
-            return ApiResponse.fail("Already moved this turn.");
-        }
-
         if (room.getCurrentYutResult() == null) {
             return ApiResponse.fail("No yut result.");
         }
@@ -92,16 +88,18 @@ public class BoardController {
                 || moveType == MoveType.CATCH;
 
         if (extraTurn) {
-            room.setAlreadyThrown(false);
-            room.setAlreadyMoved(false);
+
+            room.setTurnPhase(TurnPhase.PRIVATE_THROW);
             room.setCurrentYutResult(null);
 
             room.setSticks(new StickSide[4]);
             room.setPrivateSticks(new StickSide[2]);
             room.setPublicSticks(new StickSide[2]);
             room.setDeclaredPrivateSticks(new StickSide[2]);
+
         } else {
-            room.setAlreadyMoved(true);
+
+            room.setTurnPhase(TurnPhase.YUT_MOVE_DONE);
         }
 
         return ApiResponse.ok("Piece moved.", null);
@@ -134,8 +132,7 @@ public class BoardController {
         status.setCurrentRoom(
                 room.getTurnInfo().getCurrentTurnPlayerRoom());
 
-        status.setAlreadyThrown(room.isAlreadyThrown());
-        status.setAlreadyMoved(room.isAlreadyMoved());
+        status.setTurnPhase(room.getTurnPhase());
 
         status.setHallState(room.getHallState());
 
@@ -171,11 +168,7 @@ public class BoardController {
             return ApiResponse.fail("Not your turn.");
         }
 
-        if (room.getTurnPhase() != TurnPhase.YUT_MOVE) {
-            return ApiResponse.fail("Not in YUT_MOVE phase.");
-        }
-
-        if (!room.isAlreadyMoved()) {
+        if (room.getTurnPhase() != TurnPhase.YUT_MOVE_DONE) {
             return ApiResponse.fail("You must move before ending turn.");
         }
 
