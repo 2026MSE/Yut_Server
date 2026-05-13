@@ -35,7 +35,7 @@ public class TurnService {
         turnInfo.setCurrentTurnIndex(0);
         turnInfo.setCurrentTurnPlayerId(order.get(0));
         turnInfo.setCurrentTurnPlayerRoom(Scene.PRIVATE_ROOM);
-        
+
         room.setTurnPhase(TurnPhase.PRIVATE_THROW);
     }
 
@@ -60,6 +60,8 @@ public class TurnService {
         room.setDeclaredPrivateSticks(new StickSide[2]);
         room.setFirstChallengerId(null);
         room.getChallengeQueue().clear();
+        // 찬미 Private_Throw가 새턴의 시작 상태
+        room.setTurnPhase(TurnPhase.PRIVATE_THROW);
     }
 
     public boolean isTurnPlayer(GameRoom room, String playerId) {
