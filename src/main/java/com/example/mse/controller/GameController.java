@@ -55,16 +55,11 @@ public class GameController {
 
         response.setBoardStatus(boardStatus);
 
-        HallInfoResponse hallInfo = new HallInfoResponse();
-
-        hallInfo.setTurnPhase(room.getTurnPhase());
-        hallInfo.setPublicSticks(room.getPublicSticks());
-        hallInfo.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
-        hallInfo.setFirstChallenger(room.getFirstChallengerId());
-        hallInfo.setQueue(room.getChallengeQueue());
-
-        response.setHallInfo(hallInfo);
-
+        response.setPublicSticks(room.getPublicSticks());
+        response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
+        response.setFirstChallenger(room.getFirstChallengerId());
+        response.setChallengeQueue(room.getChallengeQueue());
+        
         return ApiResponse.ok("Game state loaded.", response);
     }
 }

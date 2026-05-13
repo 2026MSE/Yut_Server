@@ -10,7 +10,6 @@ import com.example.mse.dto.MoveRequest;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.MoveType;
 import com.example.mse.model.Piece;
-import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
 import com.example.mse.service.BoardService;
 import com.example.mse.service.GameFlowService;

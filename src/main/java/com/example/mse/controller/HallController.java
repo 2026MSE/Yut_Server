@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.DeclareRequest;
-import com.example.mse.dto.DeclareResponse;
 import com.example.mse.dto.GameActionRequest;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Scene;
@@ -59,13 +58,7 @@ public class HallController {
 
         gameFlowService.startChallengePhase(room);
 
-        DeclareResponse response = new DeclareResponse();
-
-        response.setMessage("Declared private sticks");
-        response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
-        response.setPublicSticks(room.getPublicSticks());
-
-        return ApiResponse.ok("Declared private sticks.", response);
+        return ApiResponse.ok("Declared private sticks.", null);
     }
 
     @PostMapping("/challenge")
@@ -103,7 +96,7 @@ public class HallController {
 
         turnService.moveCurrentTurnPlayerRoom(room, Scene.YUT_ROOM);
 
-        gameFlowService.startMovePhase(room);
+        room.setTurnPhase(TurnPhase.YUT_MOVE);
 
         // 찬미 Map.of-> HashMap으로 변경 -> JudgeResponse DTO로 변경
         JudgeResponse response = new JudgeResponse();
