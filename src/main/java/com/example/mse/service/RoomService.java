@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.mse.dto.RoomInfo;
+import com.example.mse.model.Board;
 import com.example.mse.model.BoardNode;
 import com.example.mse.model.GameRoom;
+import com.example.mse.model.TurnPhase;
 
 @Service
 public class RoomService {
@@ -86,6 +88,10 @@ public class RoomService {
         // }
 
         room.setStarted(true);
+        room.setWinnerId(null);
+        room.setTurnPhase(TurnPhase.WAITING);
+
+        room.setBoard(new Board());
 
         // 영준 추가
         // 게임이 시작되면, BoardService에게 지도를 받아와서 방의 보드판에 장착합니다.

@@ -98,8 +98,20 @@ public class GameFlowService {
     }
 
     public void endGame(GameRoom room, String winnerId) {
+        // 승리자 저장
         room.setWinnerId(winnerId);
+
+        // 게임 종료 상태
         room.setTurnPhase(TurnPhase.GAME_OVER);
+
+        // 같은 방에서 다시 시작할 수 있도록 게임 진행 상태 해제
+        room.setStarted(false);
+
+        // 턴 정보 초기화
+        room.getTurnInfo().setCurrentTurnPlayerId(null);
+        room.getTurnInfo().setCurrentTurnIndex(0);
+        room.getTurnInfo().getTurnOrder().clear();
+        room.getTurnInfo().setCurrentTurnPlayerRoom(null);
     }
 
 }
