@@ -8,6 +8,7 @@ import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.DeclareRequest;
 import com.example.mse.dto.GameActionRequest;
 import com.example.mse.model.GameRoom;
+import com.example.mse.model.Scene;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
 import com.example.mse.service.GameFlowService;
@@ -109,7 +110,7 @@ public class HallController {
         response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
         response.setPublicSticks(room.getPublicSticks());
         response.setActualResult(room.getCurrentYutResult());
-        response.setNextRoom("YUT_ROOM");
+        response.setNextRoom(Scene.YUT_ROOM);
 
         return ApiResponse.ok("Challenge judged.", response);
     }

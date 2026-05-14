@@ -1,5 +1,6 @@
 package com.example.mse.dto;
 
+import com.example.mse.model.Scene;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.YutResult;
 
@@ -18,5 +19,5 @@ public class JudgeResponse {
 
     private YutResult actualResult;
 
-    private String nextRoom;
+    private Scene nextRoom;
 }
