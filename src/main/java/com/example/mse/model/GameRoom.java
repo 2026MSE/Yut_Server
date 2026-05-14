@@ -27,7 +27,7 @@ public class GameRoom {
     private TurnInfo turnInfo = new TurnInfo();
     // 턴 단계 대기
     private TurnPhase turnPhase = TurnPhase.WAITING;
-    
+
     // 현재 윷 결과
     private YutResult currentYutResult;
 
@@ -43,4 +43,6 @@ public class GameRoom {
 
     // 영준 추가
     private Board board = new Board();
+
+    private String winnerId;
 }

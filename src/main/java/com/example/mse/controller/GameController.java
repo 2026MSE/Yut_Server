@@ -3,7 +3,6 @@ package com.example.mse.controller;
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.BoardStatusResponse;
 import com.example.mse.dto.GameStateResponse;
-import com.example.mse.dto.HallInfoResponse;
 import com.example.mse.dto.ThrowResponse;
 import com.example.mse.model.GameRoom;
 import com.example.mse.service.PlayerService;
@@ -59,7 +58,8 @@ public class GameController {
         response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
         response.setFirstChallenger(room.getFirstChallengerId());
         response.setChallengeQueue(room.getChallengeQueue());
-        
+        response.setWinnerId(room.getWinnerId());
+
         return ApiResponse.ok("Game state loaded.", response);
     }
 }

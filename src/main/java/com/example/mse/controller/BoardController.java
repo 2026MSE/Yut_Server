@@ -80,6 +80,11 @@ public class BoardController {
                 movingPiece,
                 targetPos);
 
+        if (boardService.isPlayerFinished(room.getBoard(), request.getPlayerId())) {
+            gameFlowService.endGame(room, request.getPlayerId());
+            return ApiResponse.ok("Game over. Winner: " + request.getPlayerId(), null);
+        }
+
         boolean extraTurn = room.getCurrentYutResult().isExtraTurn()
                 || moveType == MoveType.CATCH;
 

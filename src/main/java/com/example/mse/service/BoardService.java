@@ -223,7 +223,7 @@ public class BoardService {
             return MoveType.CATCH;
         }
     }
-    
+
     // 찬미 말 찾는 메서드 추가
     public Piece findPiece(Board board, String playerId, String pieceId) {
         List<Piece> pieces = board.getPieces().get(playerId);
@@ -239,5 +239,22 @@ public class BoardService {
         }
 
         return null;
+    }
+
+    // 찬미 승리판정 메서드 추가
+    public boolean isPlayerFinished(Board board, String playerId) {
+        List<Piece> pieces = board.getPieces().get(playerId);
+
+        if (pieces == null || pieces.isEmpty()) {
+            return false;
+        }
+
+        for (Piece piece : pieces) {
+            if (piece.getCurrentPosition() != 99) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

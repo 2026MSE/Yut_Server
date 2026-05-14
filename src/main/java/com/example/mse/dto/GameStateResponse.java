@@ -20,4 +20,5 @@ public class GameStateResponse {
     private StickSide[] declaredPrivateSticks;
     private String firstChallenger;
     private List<String> challengeQueue;
+    private String winnerId;
 }
