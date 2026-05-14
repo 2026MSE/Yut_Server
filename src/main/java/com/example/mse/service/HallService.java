@@ -12,20 +12,18 @@ public class HallService {
 
     public void declarePrivateSticks(GameRoom room, StickSide s1, StickSide s2) {
         room.setDeclaredPrivateSticks(new StickSide[] { s1, s2 });
-
-        room.setFirstChallengerId(null);
-        room.getChallengeQueue().clear();
     }
 
     public String challenge(GameRoom room, String playerId) {
 
-        if (!room.getChallengeQueue().contains(playerId)) {
-            room.getChallengeQueue().add(playerId);
+        if (System.currentTimeMillis() > room.getChallengeDeadlineMillis()) {
+            return "Challenge time is over.";
         }
 
         if (room.getFirstChallengerId() == null) {
             room.setFirstChallengerId(playerId);
-            return "You are the FIRST challenger!";
+            room.getChallengeQueue().add(playerId);
+            return "You are the first challenger.";
         }
 
         return "Too late. First challenger is " + room.getFirstChallengerId();
@@ -35,8 +33,7 @@ public class HallService {
 
         boolean truth = Arrays.equals(
                 room.getPrivateSticks(),
-                room.getDeclaredPrivateSticks()
-        );
+                room.getDeclaredPrivateSticks());
 
         if (truth) {
             return "Challenge failed. Turn player was telling the truth.";

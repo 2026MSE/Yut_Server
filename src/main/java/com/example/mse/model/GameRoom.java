@@ -16,7 +16,7 @@ public class GameRoom {
 
     private String roomId;
 
-    //방에 들어온 플레이어 아이디 목록
+    // 방에 들어온 플레이어 아이디 목록
     private List<String> playerIds = new ArrayList<>();
 
     // 방장 아이디
@@ -31,7 +31,7 @@ public class GameRoom {
     // 현재 윷 결과
     private YutResult currentYutResult;
 
-    //윷 정보
+    // 윷 정보
     private StickSide[] sticks = new StickSide[4];
     private StickSide[] privateSticks = new StickSide[2];
     private StickSide[] publicSticks = new StickSide[2];
@@ -45,4 +45,7 @@ public class GameRoom {
     private Board board = new Board();
 
     private String winnerId;
+
+    private long challengeDeadlineMillis;
+    private boolean challengeResolved = false;
 }

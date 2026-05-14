@@ -8,7 +8,6 @@ import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.DeclareRequest;
 import com.example.mse.dto.GameActionRequest;
 import com.example.mse.model.GameRoom;
-import com.example.mse.model.Scene;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
 import com.example.mse.service.GameFlowService;
@@ -87,20 +86,24 @@ public class HallController {
             return ApiResponse.fail("No yut result yet.");
         }
 
-        // 찬미 도전자가 없으면 판정 불가하도록 확인
+        if (room.getTurnPhase() != TurnPhase.MAIN_HALL_CHALLENGE) {
+            return ApiResponse.fail("Not in MAIN_HALL_CHALLENGE phase.");
+        }
+
         if (room.getFirstChallengerId() == null) {
             return ApiResponse.fail("No challenger.");
         }
 
+        if (!request.getPlayerId().equals(room.getFirstChallengerId())) {
+            return ApiResponse.fail("Only first challenger can judge.");
+        }
+
         String judgeResult = hallService.judgeChallenge(room);
 
-        turnService.moveCurrentTurnPlayerRoom(room, Scene.YUT_ROOM);
+        room.setChallengeResolved(true);
+        gameFlowService.startMovePhase(room);
 
-        room.setTurnPhase(TurnPhase.YUT_MOVE);
-
-        // 찬미 Map.of-> HashMap으로 변경 -> JudgeResponse DTO로 변경
         JudgeResponse response = new JudgeResponse();
-
         response.setJudgeResult(judgeResult);
         response.setActualPrivateSticks(room.getPrivateSticks());
         response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
