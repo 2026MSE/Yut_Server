@@ -152,6 +152,27 @@ public class BoardService {
         return currentPos;
     }
 
+    public MoveType predictMoveType(Board board, Piece movingPiece, int targetPos) {
+
+        if (targetPos == 99) {
+            return MoveType.FINISH;
+        }
+
+        List<Piece> targetPieces = board.getNodePiecesMap().get(targetPos);
+
+        if (targetPieces == null || targetPieces.isEmpty()) {
+            return MoveType.NORMAL;
+        }
+
+        Piece targetPiece = targetPieces.get(0);
+
+        if (targetPiece.getOwnerId().equals(movingPiece.getOwnerId())) {
+            return MoveType.PIGGYBACK;
+        }
+
+        return MoveType.CATCH;
+    }
+
     public MoveType movePieceAndCheckCatch(Board board, Piece movingPiece, int targetPos) {
         int oldPos = movingPiece.getCurrentPosition();
 

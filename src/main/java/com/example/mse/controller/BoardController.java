@@ -130,11 +130,19 @@ public class BoardController {
                     piece.getCurrentPosition(),
                     room.getCurrentYutResult().getMove());
 
+            MoveType moveType = boardService.predictMoveType(
+                    room.getBoard(),
+                    piece,
+                    targetPosition);
+
             MoveOption option = new MoveOption(
                     piece.getId(),
                     piece.getCurrentPosition(),
                     targetPosition,
-                    targetPosition == 99);
+                    targetPosition == 99,
+                    moveType,
+                    moveType == MoveType.CATCH,
+                    moveType == MoveType.PIGGYBACK);
 
             options.add(option);
         }
