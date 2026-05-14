@@ -8,14 +8,17 @@ import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.DeclareRequest;
 import com.example.mse.dto.GameActionRequest;
 import com.example.mse.model.GameRoom;
+import com.example.mse.model.Piece;
 import com.example.mse.model.Scene;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
+import com.example.mse.service.BoardService;
 import com.example.mse.service.GameFlowService;
 import com.example.mse.service.HallService;
 import com.example.mse.service.RoomService;
 import com.example.mse.service.TurnService;
 import com.example.mse.dto.JudgeResponse;
+import com.example.mse.dto.JudgeResponse.JudgeResult;
 
 @RestController
 @RequestMapping("/hall")
@@ -33,6 +36,9 @@ public class HallController {
 
     @Autowired
     private GameFlowService gameFlowService;
+
+    @Autowired
+    private BoardService boardService;
 
     @PostMapping("/declare")
     public Object declare(@RequestBody DeclareRequest request) {
@@ -99,13 +105,30 @@ public class HallController {
             return ApiResponse.fail("Only first challenger can judge.");
         }
 
-        String judgeResult = hallService.judgeChallenge(room);
+        JudgeResult judgeResult = hallService.judgeChallenge(room);
+
+        JudgeResponse response = new JudgeResponse();
+        response.setJudgeResult(judgeResult);
+
+        if (judgeResult == JudgeResult.CHALLENGE_SUCCESS) {
+            response.setRewardChanceCard(true);
+            response.setPenaltyApplied(false);
+        } else {
+            Piece penaltyPiece = boardService.sendFirstPieceToStart(
+                    room.getBoard(),
+                    room.getFirstChallengerId());
+
+            response.setRewardChanceCard(false);
+            response.setPenaltyApplied(penaltyPiece != null);
+
+            if (penaltyPiece != null) {
+                response.setPenaltyPieceId(penaltyPiece.getId());
+            }
+        }
 
         room.setChallengeResolved(true);
         gameFlowService.startMovePhase(room);
 
-        JudgeResponse response = new JudgeResponse();
-        response.setJudgeResult(judgeResult);
         response.setActualPrivateSticks(room.getPrivateSticks());
         response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
         response.setPublicSticks(room.getPublicSticks());

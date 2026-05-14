@@ -11,7 +11,13 @@ import lombok.Setter;
 @Setter
 public class JudgeResponse {
 
-    private String judgeResult;
+    // 챌린지 결과 enum
+    public enum JudgeResult {
+        CHALLENGE_SUCCESS,
+        CHALLENGE_FAIL
+    }
+
+    private JudgeResult judgeResult;
 
     private StickSide[] actualPrivateSticks;
     private StickSide[] declaredPrivateSticks;
@@ -20,4 +26,13 @@ public class JudgeResponse {
     private YutResult actualResult;
 
     private Scene nextRoom;
+
+    // 챌린지 성공 시
+    private boolean rewardChanceCard;
+
+    // 챌린지 실패 시
+    private boolean penaltyApplied;
+
+    // 되돌아간 말 ID
+    private String penaltyPieceId;
 }

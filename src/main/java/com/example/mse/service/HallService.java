@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.stereotype.Service;
 
+import com.example.mse.dto.JudgeResponse.JudgeResult;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.StickSide;
 
@@ -29,16 +30,16 @@ public class HallService {
         return "Too late. First challenger is " + room.getFirstChallengerId();
     }
 
-    public String judgeChallenge(GameRoom room) {
+    public JudgeResult judgeChallenge(GameRoom room) {
 
         boolean truth = Arrays.equals(
                 room.getPrivateSticks(),
                 room.getDeclaredPrivateSticks());
 
         if (truth) {
-            return "Challenge failed. Turn player was telling the truth.";
+            return JudgeResult.CHALLENGE_FAIL;
         } else {
-            return "Challenge success. Turn player was bluffing.";
+            return JudgeResult.CHALLENGE_SUCCESS;
         }
     }
 }
