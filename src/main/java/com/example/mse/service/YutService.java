@@ -21,16 +21,6 @@ public class YutService {
 
         room.setSticks(sticks);
 
-        room.setPrivateSticks(new StickSide[] {
-                sticks[0],
-                sticks[1]
-        });
-
-        room.setPublicSticks(new StickSide[] {
-                sticks[2],
-                sticks[3]
-        });
-
         YutResult result = calculateResult(sticks);
 
         room.setCurrentYutResult(result);
@@ -118,8 +108,6 @@ public class YutService {
 
         room.setCurrentYutResult(null);
         room.setSticks(new StickSide[4]);
-        room.setPrivateSticks(new StickSide[2]);
-        room.setPublicSticks(new StickSide[2]);
     }
 
     // 찬미 ThrowResponse 메서드 추가

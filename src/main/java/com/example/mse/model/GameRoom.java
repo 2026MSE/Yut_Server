@@ -33,8 +33,21 @@ public class GameRoom {
 
     // 윷 정보
     private StickSide[] sticks = new StickSide[4];
-    private StickSide[] privateSticks = new StickSide[2];
-    private StickSide[] publicSticks = new StickSide[2];
+
+    public StickSide[] getPrivateSticks() {
+        return new StickSide[] {
+                sticks[0],
+                sticks[1]
+        };
+    }
+
+    public StickSide[] getPublicSticks() {
+        return new StickSide[] {
+                sticks[2],
+                sticks[3]
+        };
+    }
+
     private StickSide[] declaredPrivateSticks = new StickSide[2];
 
     // 챌린지 정보
