@@ -278,4 +278,49 @@ public class BoardService {
 
         return true;
     }
+
+    // 챌린지 실패 시, 해당 플레이어의 말 중 보드 위에 있는 첫 번째 말을 대기석(-1)으로 되돌림
+    public Piece sendFirstPieceToStart(Board board, String playerId) {
+        List<Piece> pieces = board.getPieces().get(playerId);
+
+        if (pieces == null || pieces.isEmpty()) {
+            return null;
+        }
+
+        // 대기석(-1) 리스트 준비
+        board.getNodePiecesMap().putIfAbsent(-1, new ArrayList<>());
+        List<Piece> waitingPieces = board.getNodePiecesMap().get(-1);
+
+        for (Piece piece : pieces) {
+            int currentPos = piece.getCurrentPosition();
+
+            // 대기석(-1)이나 완주(99)한 말은 제외
+            if (currentPos == -1 || currentPos == 99) {
+                continue;
+            }
+
+            // 현재 위치 리스트에서 제거
+            List<Piece> currentNodePieces = board.getNodePiecesMap().get(currentPos);
+            if (currentNodePieces != null) {
+                currentNodePieces.remove(piece);
+            }
+
+            // 업고 있던 말들도 같이 대기석으로 이동
+            for (Piece carried : piece.getCarriedPieces()) {
+                carried.setCurrentPosition(-1);
+                waitingPieces.add(carried);
+            }
+
+            piece.getCarriedPieces().clear();
+
+            // 대표 말도 대기석으로 이동
+            piece.setCurrentPosition(-1);
+            waitingPieces.add(piece);
+
+            return piece;
+        }
+
+        // 보드 위에 되돌릴 말이 없는 경우
+        return null;
+    }
 }
