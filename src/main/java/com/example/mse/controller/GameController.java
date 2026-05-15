@@ -108,11 +108,6 @@ public class GameController {
         boardStatus.setCurrentTurnPlayerId(
                 room.getTurnInfo().getCurrentTurnPlayerId());
 
-        // 현재 턴 플레이어가 위치한 Scene
-        // (PRIVATE_ROOM / MAIN_HALL / YUT_ROOM)
-        boardStatus.setCurrentRoom(
-                room.getTurnInfo().getCurrentTurnPlayerRoom());
-
         // 현재 게임 진행 단계
         // (TurnPhase)
         boardStatus.setTurnPhase(room.getTurnPhase());

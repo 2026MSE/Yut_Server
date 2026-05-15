@@ -1,7 +1,6 @@
 package com.example.mse.dto;
 
 import com.example.mse.model.Piece;
-import com.example.mse.model.Scene;
 import com.example.mse.model.TurnPhase;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +18,6 @@ public class BoardStatusResponse {
     private ThrowResponse throwResult;
 
     private String currentTurnPlayerId;
-    private Scene currentRoom;
 
     private TurnPhase turnPhase;
 

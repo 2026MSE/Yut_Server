@@ -1,6 +1,5 @@
 package com.example.mse.dto;
 
-import com.example.mse.model.Scene;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.YutResult;
 
@@ -24,8 +23,6 @@ public class JudgeResponse {
     private StickSide[] publicSticks;
 
     private YutResult actualResult;
-
-    private Scene nextRoom;
 
     // 챌린지 성공 시
     private boolean rewardChanceCard;

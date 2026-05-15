@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.mse.model.GameRoom;
-import com.example.mse.model.Scene;
 import com.example.mse.model.TurnPhase;
 
 @Service
@@ -56,10 +55,7 @@ public class GameFlowService {
     }
 
     public void startMovePhase(GameRoom room) {
-
         room.setTurnPhase(TurnPhase.YUT_MOVE);
-
-        room.getTurnInfo().setCurrentTurnPlayerRoom(Scene.YUT_ROOM);
     }
 
     public void finishMovePhase(GameRoom room) {
@@ -85,7 +81,6 @@ public class GameFlowService {
         room.setChallengeDeadlineMillis(0);
 
         room.setTurnPhase(TurnPhase.PRIVATE_THROW);
-        room.getTurnInfo().setCurrentTurnPlayerRoom(Scene.PRIVATE_ROOM);
     }
 
     public void handleMoveResult(GameRoom room, boolean extraTurn) {
@@ -111,7 +106,6 @@ public class GameFlowService {
         room.getTurnInfo().setCurrentTurnPlayerId(null);
         room.getTurnInfo().setCurrentTurnIndex(0);
         room.getTurnInfo().getTurnOrder().clear();
-        room.getTurnInfo().setCurrentTurnPlayerRoom(null);
     }
 
 }

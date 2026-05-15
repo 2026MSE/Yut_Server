@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.mse.dto.TurnInfo;
 import com.example.mse.model.GameRoom;
-import com.example.mse.model.Scene;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
 
@@ -33,8 +32,8 @@ public class TurnService {
         turnInfo.setTurnOrder(order);
         turnInfo.setCurrentTurnIndex(0);
         turnInfo.setCurrentTurnPlayerId(order.get(0));
-        turnInfo.setCurrentTurnPlayerRoom(Scene.PRIVATE_ROOM);
 
+        // 게임 진행 판단은 TurnPhase를 기준으로 한다.
         room.setTurnPhase(TurnPhase.PRIVATE_THROW);
     }
 
@@ -50,7 +49,6 @@ public class TurnService {
 
         turnInfo.setCurrentTurnIndex(nextIndex);
         turnInfo.setCurrentTurnPlayerId(order.get(nextIndex));
-        turnInfo.setCurrentTurnPlayerRoom(Scene.PRIVATE_ROOM);
 
         // 찬미 초기화 부분 수정
         privateService.resetTurn(room);
@@ -64,9 +62,5 @@ public class TurnService {
 
     public boolean isTurnPlayer(GameRoom room, String playerId) {
         return room.getTurnInfo().getCurrentTurnPlayerId().equals(playerId);
-    }
-
-    public void moveCurrentTurnPlayerRoom(GameRoom room, Scene scene) {
-        room.getTurnInfo().setCurrentTurnPlayerRoom(scene);
     }
 }
