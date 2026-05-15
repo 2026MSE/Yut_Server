@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.mse.model.GameRoom;
+import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
 
 @Service
@@ -64,21 +65,17 @@ public class GameFlowService {
     }
 
     public void endTurn(GameRoom room) {
-
         room.setTurnPhase(TurnPhase.TURN_END);
 
+        resetForNextTurn(room);
+
         turnService.nextTurn(room);
+
+        room.setTurnPhase(TurnPhase.PRIVATE_THROW);
     }
 
     public void handleExtraTurn(GameRoom room) {
-        yutService.resetTurn(room);
-
-        room.setDeclaredPrivateSticks(new com.example.mse.model.StickSide[2]);
-        room.setFirstChallengerId(null);
-        room.getChallengeQueue().clear();
-
-        room.setChallengeResolved(false);
-        room.setChallengeDeadlineMillis(0);
+        resetForExtraTurn(room);
 
         room.setTurnPhase(TurnPhase.PRIVATE_THROW);
     }
@@ -108,4 +105,25 @@ public class GameFlowService {
         room.getTurnInfo().getTurnOrder().clear();
     }
 
+    private void resetThrowState(GameRoom room) {
+        yutService.resetTurn(room);
+        room.setDeclaredPrivateSticks(new StickSide[2]);
+    }
+
+    private void resetChallengeState(GameRoom room) {
+        room.setFirstChallengerId(null);
+        room.getChallengeQueue().clear();
+        room.setChallengeResolved(false);
+        room.setChallengeDeadlineMillis(0);
+    }
+
+    public void resetForNextTurn(GameRoom room) {
+        resetThrowState(room);
+        resetChallengeState(room);
+    }
+
+    public void resetForExtraTurn(GameRoom room) {
+        resetThrowState(room);
+        resetChallengeState(room);
+    }
 }

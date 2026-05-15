@@ -4,19 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.mse.dto.TurnInfo;
 import com.example.mse.model.GameRoom;
-import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
 
 @Service
 public class TurnService {
-
-    @Autowired
-    private YutService privateService;
 
     public void startGame(GameRoom room) {
         List<String> order = new ArrayList<>(room.getPlayerIds());
@@ -49,15 +44,6 @@ public class TurnService {
 
         turnInfo.setCurrentTurnIndex(nextIndex);
         turnInfo.setCurrentTurnPlayerId(order.get(nextIndex));
-
-        // 찬미 초기화 부분 수정
-        privateService.resetTurn(room);
-
-        room.setDeclaredPrivateSticks(new StickSide[2]);
-        room.setFirstChallengerId(null);
-        room.getChallengeQueue().clear();
-        // 찬미 Private_Throw가 새턴의 시작 상태
-        room.setTurnPhase(TurnPhase.PRIVATE_THROW);
     }
 
     public boolean isTurnPlayer(GameRoom room, String playerId) {
