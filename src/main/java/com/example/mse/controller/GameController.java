@@ -27,13 +27,15 @@ public class GameController {
         private GameStateAssembler gameStateAssembler;
 
         @GetMapping("/state")
-        public ApiResponse<GameStateResponse> getGameState(@RequestParam String roomId) {
+        public ApiResponse<GameStateResponse> getGameState(
+                        @RequestParam String roomId,
+                        @RequestParam String playerId) {
 
                 GameRoom room = roomService.requireRoom(roomId);
 
                 gameFlowService.resolveChallengeTimeout(room);
 
-                GameStateResponse response = gameStateAssembler.build(room);
+                GameStateResponse response = gameStateAssembler.build(room, playerId);
 
                 return ApiResponse.ok("Game state loaded.", response);
         }

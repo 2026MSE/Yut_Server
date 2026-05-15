@@ -107,7 +107,6 @@ public class BoardController {
 
         if (boardService.isPlayerFinished(room.getBoard(), request.getPlayerId())) {
             gameFlowService.endGame(room, request.getPlayerId());
-
             response.setGameOver(true);
             response.setWinnerId(request.getPlayerId());
 

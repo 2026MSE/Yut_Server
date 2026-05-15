@@ -86,6 +86,11 @@ public class HallController {
 
         String result = hallService.challenge(room, request.getPlayerId());
 
+        gameFlowService.addLog(
+                room,
+                "CHALLENGE",
+                request.getPlayerId() + " challenged.");
+
         return ApiResponse.ok(result, null);
     }
 

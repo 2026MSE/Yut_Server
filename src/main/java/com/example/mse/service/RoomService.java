@@ -130,8 +130,7 @@ public class RoomService {
     // 2. board에서 해당 플레이어의 말 제거
     // 3. 현재 턴 플레이어가 나간 경우 nextTurn 처리
     // 4. 챌린저가 나간 경우 challenge 상태 정리
-    // 5. 남은 플레이어가 1명인 경우 자동 승리 처리
-    // 가 필요하다.
+    // 5. 남은 플레이어가 1명인 경우 자동 승리 처리가 필요하다.
     // 방 나가면 다음 사람이 자동 방장
     public GameRoom leaveRoom(String roomId, String playerId) {
         GameRoom room = requireRoom(roomId);
