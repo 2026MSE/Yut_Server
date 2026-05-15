@@ -149,9 +149,7 @@ public class BoardController {
                     piece.getCurrentPosition(),
                     targetPosition,
                     targetPosition == 99,
-                    moveType,
-                    moveType == MoveType.CATCH,
-                    moveType == MoveType.PIGGYBACK);
+                    moveType);
 
             options.add(option);
         }
