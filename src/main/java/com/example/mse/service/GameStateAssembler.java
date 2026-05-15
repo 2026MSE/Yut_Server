@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.mse.dto.BoardStatusResponse;
 import com.example.mse.dto.GameStateResponse;
-import com.example.mse.dto.ThrowResponse;
 import com.example.mse.model.GameRoom;
 
 @Service
@@ -29,22 +28,12 @@ public class GameStateAssembler {
 
         boardStatus.setAllPieces(room.getBoard().getPieces());
 
-        boardStatus.setExtraTurn(
-                room.getCurrentYutResult() != null &&
-                        room.getCurrentYutResult().isExtraTurn());
-
-        ThrowResponse throwResponse = new ThrowResponse();
-        throwResponse.setSticks(room.getSticks());
-        throwResponse.setPrivateSticks(room.getPrivateSticks());
-        throwResponse.setPublicSticks(room.getPublicSticks());
-        throwResponse.setYutResult(room.getCurrentYutResult());
-
-        boardStatus.setThrowResult(throwResponse);
-
         boardStatus.setCurrentTurnPlayerId(
                 room.getTurnInfo().getCurrentTurnPlayerId());
 
         boardStatus.setTurnPhase(room.getTurnPhase());
+
+        response.setCurrentYutResult(room.getCurrentYutResult());
 
         response.setBoardStatus(boardStatus);
 

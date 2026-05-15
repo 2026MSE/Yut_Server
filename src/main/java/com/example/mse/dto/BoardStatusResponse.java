@@ -14,9 +14,6 @@ public class BoardStatusResponse {
 
     private Map<String, List<Piece>> allPieces;
 
-    private boolean extraTurn;
-    private ThrowResponse throwResult;
-
     private String currentTurnPlayerId;
 
     private TurnPhase turnPhase;

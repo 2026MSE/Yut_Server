@@ -6,6 +6,7 @@ import lombok.Setter;
 import java.util.List;
 
 import com.example.mse.model.StickSide;
+import com.example.mse.model.YutResult;
 
 @Getter
 @Setter
@@ -20,6 +21,8 @@ public class GameStateResponse {
     private StickSide[] declaredPrivateSticks;
     private String firstChallenger;
     private List<String> challengeQueue;
+
+    private YutResult currentYutResult;
 
     private long challengeDeadlineMillis;
     private long serverTimeMillis;
