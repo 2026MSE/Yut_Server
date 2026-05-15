@@ -16,7 +16,7 @@ public class GameStateAssembler {
     @Autowired
     private PlayerService playerService;
 
-    public GameStateResponse build(GameRoom room) {
+    public GameStateResponse build(GameRoom room, String playerId) {
 
         GameStateResponse response = new GameStateResponse();
 
@@ -34,6 +34,15 @@ public class GameStateAssembler {
         boardStatus.setTurnPhase(room.getTurnPhase());
 
         response.setCurrentYutResult(room.getCurrentYutResult());
+
+        boolean isTurnPlayer = room.getTurnInfo().getCurrentTurnPlayerId() != null
+                && room.getTurnInfo().getCurrentTurnPlayerId().equals(playerId);
+
+        if (isTurnPlayer) {
+            response.setPrivateSticks(room.getPrivateSticks());
+        } else {
+            response.setPrivateSticks(null);
+        }
 
         response.setBoardStatus(boardStatus);
 
