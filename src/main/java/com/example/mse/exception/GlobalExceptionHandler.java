@@ -1,4 +1,3 @@
-// 예외 처리를 위한 글로벌 핸들러
 package com.example.mse.exception;
 
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,6 +11,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ApiResponse<?> handleRuntimeException(RuntimeException e) {
 
-        return ApiResponse.fail(e.getMessage());
+        return ApiResponse.fail(e.getMessage(), "RUNTIME_ERROR");
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ApiResponse<?> handleException(Exception e) {
+
+        return ApiResponse.fail("Unexpected server error.", "INTERNAL_SERVER_ERROR");
     }
 }
