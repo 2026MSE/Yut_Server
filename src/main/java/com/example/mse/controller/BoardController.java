@@ -6,6 +6,7 @@ import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.MoveListResponse;
 import com.example.mse.dto.MoveOption;
 import com.example.mse.dto.MoveRequest;
+import com.example.mse.dto.MoveResultResponse;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.MoveType;
 import com.example.mse.model.Piece;
@@ -41,7 +42,7 @@ public class BoardController {
     // 찬미 /board/move는 말을 이동시키는 버튼 역할만 하게 변경
     // yut/move랑 통합, currentYutResult 기준으로 이동
     @PostMapping("/move")
-    public ApiResponse<Void> movePiece(@RequestBody MoveRequest request) {
+    public ApiResponse<MoveResultResponse> movePiece(@RequestBody MoveRequest request) {
 
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
@@ -74,6 +75,8 @@ public class BoardController {
             return ApiResponse.fail("This piece already finished.");
         }
 
+        int fromPosition = movingPiece.getCurrentPosition();
+
         int targetPos = boardService.calculateNextPath(
                 room.getBoard(),
                 movingPiece.getCurrentPosition(),
@@ -84,17 +87,31 @@ public class BoardController {
                 movingPiece,
                 targetPos);
 
-        if (boardService.isPlayerFinished(room.getBoard(), request.getPlayerId())) {
-            gameFlowService.endGame(room, request.getPlayerId());
-            return ApiResponse.ok("Game over. Winner: " + request.getPlayerId(), null);
-        }
-
         boolean extraTurn = room.getCurrentYutResult().isExtraTurn()
                 || moveType == MoveType.CATCH;
 
+        MoveResultResponse response = new MoveResultResponse();
+        response.setPieceId(movingPiece.getId());
+        response.setFromPosition(fromPosition);
+        response.setToPosition(targetPos);
+        response.setMoveType(moveType);
+        response.setExtraTurn(extraTurn);
+
+        if (boardService.isPlayerFinished(room.getBoard(), request.getPlayerId())) {
+            gameFlowService.endGame(room, request.getPlayerId());
+
+            response.setGameOver(true);
+            response.setWinnerId(request.getPlayerId());
+
+            return ApiResponse.ok("Game over. Winner: " + request.getPlayerId(), response);
+        }
+
+        response.setGameOver(false);
+        response.setWinnerId(null);
+
         gameFlowService.handleMoveResult(room, extraTurn);
 
-        return ApiResponse.ok("Piece moved.", null);
+        return ApiResponse.ok("Piece moved.", response);
     }
 
     @GetMapping("/moveList")
