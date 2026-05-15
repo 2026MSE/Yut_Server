@@ -3,6 +3,7 @@ package com.example.mse.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.mse.dto.JudgeResponse.JudgeResult;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
@@ -15,6 +16,12 @@ public class GameFlowService {
 
     @Autowired
     private YutService yutService;
+
+    @Autowired
+    private HallService hallService;
+
+    @Autowired
+    private BoardService boardService;
 
     public void startPrivateThrowPhase(GameRoom room) {
 
@@ -48,11 +55,26 @@ public class GameFlowService {
             return;
         }
 
-        // 챌린지 없으면 바로 윷룸 이동
+        // 챌린지가 없으면 바로 이동 단계로 전환
         if (room.getFirstChallengerId() == null) {
             room.setChallengeResolved(true);
             startMovePhase(room);
+            return;
         }
+
+        // 챌린지가 있으면 서버가 자동 판정
+        JudgeResult judgeResult = hallService.judgeChallenge(room);
+
+        if (judgeResult == JudgeResult.CHALLENGE_FAIL) {
+            // 챌린저가 틀렸으므로 챌린저의 말 하나를 시작점으로 되돌림
+            boardService.sendFirstPieceToStart(
+                    room.getBoard(),
+                    room.getFirstChallengerId());
+        }
+
+        // CHALLENGE_SUCCESS인 경우는 이후 ChanceCard에서 보상 처리 예정
+        room.setChallengeResolved(true);
+        startMovePhase(room);
     }
 
     public void startMovePhase(GameRoom room) {
