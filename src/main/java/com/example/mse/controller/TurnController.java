@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.GameActionRequest;
+import com.example.mse.dto.ThrowResponse;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.TurnPhase;
 import com.example.mse.service.GameFlowService;
@@ -31,7 +32,7 @@ public class TurnController {
     private GameFlowService gameFlowService;
 
     @PostMapping("/throw")
-    public ApiResponse<Void> throwYut(@RequestBody GameActionRequest request) {
+    public ApiResponse<ThrowResponse> throwYut(@RequestBody GameActionRequest request) {
 
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
@@ -43,11 +44,11 @@ public class TurnController {
             return ApiResponse.fail("Not in PRIVATE_THROW phase.");
         }
 
-        yutService.getThrowResponse(room);
+        ThrowResponse response = yutService.getThrowResponse(room);
 
         gameFlowService.startDeclarePhase(room);
 
-        return ApiResponse.ok("Yut thrown.", null);
+        return ApiResponse.ok("Yut thrown.", response);
     }
 
     @PostMapping("/end")
