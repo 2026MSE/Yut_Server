@@ -185,9 +185,15 @@ public class BoardService {
 
         if (targetPos == 99) {
             movingPiece.setCurrentPosition(99);
+            movingPiece.setCarriedByPieceId(null);
+
             for (Piece carried : movingPiece.getCarriedPieces()) {
                 carried.setCurrentPosition(99);
+                carried.setCarriedByPieceId(null);
             }
+
+            movingPiece.getCarriedPieces().clear();
+
             return MoveType.FINISH;
         }
 
@@ -211,11 +217,18 @@ public class BoardService {
                 carried.setCurrentPosition(targetPos);
             }
 
-            // targetPos에 있던 말과 그 말이 업고 있던 말들을 이동한 말이 업음
-            targetPiece.getCarriedPieces().add(movingPiece);
-            targetPiece.getCarriedPieces().addAll(movingPiece.getCarriedPieces());
+            // 이동한 말과 이동한 말이 업고 있던 말들을 targetPiece가 업음
+            List<Piece> carriedList = new ArrayList<>(movingPiece.getCarriedPieces());
 
-            // 이동한 말은 대표말이 아니므로 carriedPieces는 초기화
+            movingPiece.setCarriedByPieceId(targetPiece.getId());
+            targetPiece.getCarriedPieces().add(movingPiece);
+
+            for (Piece carried : carriedList) {
+                carried.setCurrentPosition(targetPos);
+                carried.setCarriedByPieceId(targetPiece.getId());
+                targetPiece.getCarriedPieces().add(carried);
+            }
+
             movingPiece.getCarriedPieces().clear();
 
             return MoveType.PIGGYBACK;
@@ -224,12 +237,13 @@ public class BoardService {
             board.getNodePiecesMap().putIfAbsent(-1, new ArrayList<>());
             List<Piece> waitingPieces = board.getNodePiecesMap().get(-1);
 
-            // 잡힌 말과 그 말이 업고 있던 말들을 대기석으로 이동
             targetPiece.setCurrentPosition(-1);
+            targetPiece.setCarriedByPieceId(null);
             waitingPieces.add(targetPiece);
 
             for (Piece carried : targetPiece.getCarriedPieces()) {
                 carried.setCurrentPosition(-1);
+                carried.setCarriedByPieceId(null);
                 waitingPieces.add(carried);
             }
 
@@ -305,18 +319,17 @@ public class BoardService {
                 currentNodePieces.remove(piece);
             }
 
-            // 업고 있던 말들도 같이 대기석으로 이동
             for (Piece carried : piece.getCarriedPieces()) {
                 carried.setCurrentPosition(-1);
+                carried.setCarriedByPieceId(null);
                 waitingPieces.add(carried);
             }
 
             piece.getCarriedPieces().clear();
 
-            // 대표 말도 대기석으로 이동
             piece.setCurrentPosition(-1);
+            piece.setCarriedByPieceId(null);
             waitingPieces.add(piece);
-
             return piece;
         }
 
