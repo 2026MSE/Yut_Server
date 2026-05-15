@@ -63,6 +63,11 @@ public class HallController {
 
         gameFlowService.startChallengePhase(room);
 
+        gameFlowService.addLog(
+                room,
+                "DECLARE",
+                request.getPlayerId() + " declared private sticks.");
+
         return ApiResponse.ok("Declared private sticks.", null);
     }
 

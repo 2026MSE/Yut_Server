@@ -21,6 +21,9 @@ public class GameRoom {
 
     // 방장 아이디
     private String hostId;
+    
+    // 게임로그 리스트
+    private List<GameLog> logs = new ArrayList<>();
 
     private boolean started = false;
     // 턴 정보

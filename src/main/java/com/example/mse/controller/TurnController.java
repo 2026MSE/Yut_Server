@@ -48,6 +48,11 @@ public class TurnController {
 
         gameFlowService.startDeclarePhase(room);
 
+        gameFlowService.addLog(
+                room,
+                "THROW",
+                request.getPlayerId() + " threw yut: " + response.getYutResult().getResult());
+
         return ApiResponse.ok("Yut thrown.", response);
     }
 

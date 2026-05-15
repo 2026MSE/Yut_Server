@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.mse.dto.JudgeResponse.JudgeResult;
+import com.example.mse.model.GameLog;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
@@ -22,6 +23,10 @@ public class GameFlowService {
 
     @Autowired
     private BoardService boardService;
+
+    public void addLog(GameRoom room, String type, String message) {
+    room.getLogs().add(new GameLog(type, message));
+}
 
     public void startPrivateThrowPhase(GameRoom room) {
 
@@ -64,6 +69,8 @@ public class GameFlowService {
 
         // 챌린지가 있으면 서버가 자동 판정
         JudgeResult judgeResult = hallService.judgeChallenge(room);
+
+        addLog(room, "JUDGE", "Challenge result: " + judgeResult);
 
         if (judgeResult == JudgeResult.CHALLENGE_FAIL) {
             // 챌린저가 틀렸으므로 챌린저의 말 하나를 시작점으로 되돌림
@@ -125,6 +132,8 @@ public class GameFlowService {
         room.getTurnInfo().setCurrentTurnPlayerId(null);
         room.getTurnInfo().setCurrentTurnIndex(0);
         room.getTurnInfo().getTurnOrder().clear();
+
+        addLog(room, "GAME_OVER", "Winner: " + winnerId);
     }
 
     private void resetThrowState(GameRoom room) {

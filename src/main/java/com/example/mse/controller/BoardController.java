@@ -90,6 +90,14 @@ public class BoardController {
         boolean extraTurn = room.getCurrentYutResult().isExtraTurn()
                 || moveType == MoveType.CATCH;
 
+        gameFlowService.addLog(
+                room,
+                "MOVE",
+                request.getPlayerId() + " moved " + movingPiece.getId()
+                        + " from " + fromPosition
+                        + " to " + targetPos
+                        + " (" + moveType + ")");
+
         MoveResultResponse response = new MoveResultResponse();
         response.setPieceId(movingPiece.getId());
         response.setFromPosition(fromPosition);
