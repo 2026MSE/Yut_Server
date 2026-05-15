@@ -66,6 +66,10 @@ public class BoardController {
             return ApiResponse.fail("Piece not found.");
         }
 
+        if (movingPiece.getCarriedByPieceId() != null) {
+            return ApiResponse.fail("Carried piece cannot move alone.");
+        }
+
         if (movingPiece.getCurrentPosition() == 99) {
             return ApiResponse.fail("This piece already finished.");
         }
@@ -122,6 +126,11 @@ public class BoardController {
 
         for (Piece piece : pieces) {
             if (piece.getCurrentPosition() == 99) {
+                continue;
+            }
+
+            // 다른 말에게 업혀 있는 말은 단독 이동 불가
+            if (piece.getCarriedByPieceId() != null) {
                 continue;
             }
 

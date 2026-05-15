@@ -174,21 +174,13 @@ public class BoardService {
     }
 
     public MoveType movePieceAndCheckCatch(Board board, Piece movingPiece, int targetPos) {
-        int oldPos = movingPiece.getCurrentPosition();
-
-        if (oldPos != -1 && oldPos != 99) {
-            List<Piece> oldPosList = board.getNodePiecesMap().get(oldPos);
-            if (oldPosList != null) {
-                oldPosList.remove(movingPiece);
-            }
-        }
 
         if (targetPos == 99) {
-            movingPiece.setCurrentPosition(99);
+            moveSinglePiece(board, movingPiece, 99);
             movingPiece.setCarriedByPieceId(null);
 
             for (Piece carried : movingPiece.getCarriedPieces()) {
-                carried.setCurrentPosition(99);
+                moveSinglePiece(board, carried, 99);
                 carried.setCarriedByPieceId(null);
             }
 
@@ -201,29 +193,24 @@ public class BoardService {
                 .computeIfAbsent(targetPos, k -> new ArrayList<>());
 
         if (targetPieces.isEmpty()) {
-            movingPiece.setCurrentPosition(targetPos);
-            targetPieces.add(movingPiece);
+            moveSinglePiece(board, movingPiece, targetPos);
             return MoveType.NORMAL;
         }
 
         Piece targetPiece = targetPieces.get(0);
 
         if (targetPiece.getOwnerId().equals(movingPiece.getOwnerId())) {
-            // 이동한 말과 그 말이 업고 있던 말들의 위치를 targetPos로 업데이트
-            movingPiece.setCurrentPosition(targetPos);
-
-            // 찬미 위치 갱신코드 추가
-            for (Piece carried : movingPiece.getCarriedPieces()) {
-                carried.setCurrentPosition(targetPos);
-            }
-
-            // 이동한 말과 이동한 말이 업고 있던 말들을 targetPiece가 업음
             List<Piece> carriedList = new ArrayList<>(movingPiece.getCarriedPieces());
 
+            removeFromNode(board, movingPiece);
+
+            movingPiece.setCurrentPosition(targetPos);
             movingPiece.setCarriedByPieceId(targetPiece.getId());
+
             targetPiece.getCarriedPieces().add(movingPiece);
 
             for (Piece carried : carriedList) {
+                removeFromNode(board, carried);
                 carried.setCurrentPosition(targetPos);
                 carried.setCarriedByPieceId(targetPiece.getId());
                 targetPiece.getCarriedPieces().add(carried);
@@ -233,27 +220,29 @@ public class BoardService {
 
             return MoveType.PIGGYBACK;
         } else {
-            // 대기석 리스트 준비
             board.getNodePiecesMap().putIfAbsent(-1, new ArrayList<>());
-            List<Piece> waitingPieces = board.getNodePiecesMap().get(-1);
 
+            // 먼저 이동하는 말을 기존 위치에서 제거
+            removeFromNode(board, movingPiece);
+
+            // 잡힌 말과 업힌 말들을 대기석으로 이동
             targetPiece.setCurrentPosition(-1);
             targetPiece.setCarriedByPieceId(null);
-            waitingPieces.add(targetPiece);
+            board.getNodePiecesMap().get(-1).add(targetPiece);
 
             for (Piece carried : targetPiece.getCarriedPieces()) {
                 carried.setCurrentPosition(-1);
                 carried.setCarriedByPieceId(null);
-                waitingPieces.add(carried);
+                board.getNodePiecesMap().get(-1).add(carried);
             }
 
             targetPiece.getCarriedPieces().clear();
 
-            // targetPos 칸 비우기
+            // target 칸 비우기
             targetPieces.clear();
-            // 이동한 말 targetPos로 이동
-            movingPiece.setCurrentPosition(targetPos);
-            targetPieces.add(movingPiece);
+
+            // 이동한 말을 target 칸에 추가
+            addToNode(board, movingPiece, targetPos);
 
             return MoveType.CATCH;
         }
@@ -293,7 +282,7 @@ public class BoardService {
         return true;
     }
 
-    // 챌린지 실패 시, 해당 플레이어의 말 중 보드 위에 있는 첫 번째 말을 대기석(-1)으로 되돌림
+    // 챌린지 실패 시, 해당 플레이어의 말 중 보드 위에 있는 대표 말 하나를 대기석(-1)으로 되돌림
     public Piece sendFirstPieceToStart(Board board, String playerId) {
         List<Piece> pieces = board.getPieces().get(playerId);
 
@@ -301,39 +290,66 @@ public class BoardService {
             return null;
         }
 
-        // 대기석(-1) 리스트 준비
         board.getNodePiecesMap().putIfAbsent(-1, new ArrayList<>());
-        List<Piece> waitingPieces = board.getNodePiecesMap().get(-1);
 
         for (Piece piece : pieces) {
             int currentPos = piece.getCurrentPosition();
 
-            // 대기석(-1)이나 완주(99)한 말은 제외
+            // 대기석, 완주 말 제외
             if (currentPos == -1 || currentPos == 99) {
                 continue;
             }
 
-            // 현재 위치 리스트에서 제거
-            List<Piece> currentNodePieces = board.getNodePiecesMap().get(currentPos);
-            if (currentNodePieces != null) {
-                currentNodePieces.remove(piece);
+            // 업힌 말은 대표말이 아니므로 제외
+            if (piece.getCarriedByPieceId() != null) {
+                continue;
             }
 
+            // 대표말을 현재 노드에서 제거
+            removeFromNode(board, piece);
+
+            // 업고 있던 말들도 대기석으로 이동
             for (Piece carried : piece.getCarriedPieces()) {
-                carried.setCurrentPosition(-1);
                 carried.setCarriedByPieceId(null);
-                waitingPieces.add(carried);
+                addToNode(board, carried, -1);
             }
 
             piece.getCarriedPieces().clear();
 
-            piece.setCurrentPosition(-1);
+            // 대표말도 대기석으로 이동
             piece.setCarriedByPieceId(null);
-            waitingPieces.add(piece);
+            addToNode(board, piece, -1);
+
             return piece;
         }
 
-        // 보드 위에 되돌릴 말이 없는 경우
         return null;
+    }
+
+    private void removeFromNode(Board board, Piece piece) {
+        int currentPos = piece.getCurrentPosition();
+
+        if (currentPos == -1 || currentPos == 99) {
+            return;
+        }
+
+        List<Piece> currentNodePieces = board.getNodePiecesMap().get(currentPos);
+
+        if (currentNodePieces != null) {
+            currentNodePieces.remove(piece);
+        }
+    }
+
+    private void addToNode(Board board, Piece piece, int targetPos) {
+        board.getNodePiecesMap()
+                .computeIfAbsent(targetPos, k -> new ArrayList<>())
+                .add(piece);
+
+        piece.setCurrentPosition(targetPos);
+    }
+
+    private void moveSinglePiece(Board board, Piece piece, int targetPos) {
+        removeFromNode(board, piece);
+        addToNode(board, piece, targetPos);
     }
 }
