@@ -3,6 +3,7 @@
 package com.example.mse.controller;
 
 import com.example.mse.dto.ApiResponse;
+import com.example.mse.dto.MoveGroup;
 import com.example.mse.dto.MoveListResponse;
 import com.example.mse.dto.MoveOption;
 import com.example.mse.dto.MoveRequest;
@@ -11,6 +12,7 @@ import com.example.mse.model.GameRoom;
 import com.example.mse.model.MoveType;
 import com.example.mse.model.Piece;
 import com.example.mse.model.TurnPhase;
+import com.example.mse.model.YutResult;
 import com.example.mse.service.BoardService;
 import com.example.mse.service.GameFlowService;
 import com.example.mse.service.RoomService;
@@ -54,8 +56,13 @@ public class BoardController {
             return ApiResponse.fail("Not in YUT_MOVE phase.");
         }
 
-        if (room.getCurrentYutResult() == null) {
-            return ApiResponse.fail("No yut result.");
+        if (room.getPendingYutResults() == null || room.getPendingYutResults().isEmpty()) {
+            return ApiResponse.fail("No pending yut results.");
+        }
+
+        if (request.getYutResultIndex() < 0 ||
+                request.getYutResultIndex() >= room.getPendingYutResults().size()) {
+            return ApiResponse.fail("Invalid yut result index.");
         }
 
         Piece movingPiece = boardService.findPiece(
@@ -75,28 +82,21 @@ public class BoardController {
             return ApiResponse.fail("This piece already finished.");
         }
 
+        YutResult selectedResult = room.getPendingYutResults().get(request.getYutResultIndex());
+
         int fromPosition = movingPiece.getCurrentPosition();
 
         int targetPos = boardService.calculateNextPath(
                 room.getBoard(),
                 movingPiece.getCurrentPosition(),
-                room.getCurrentYutResult().getMove());
+                selectedResult.getMove());
 
         MoveType moveType = boardService.movePieceAndCheckCatch(
                 room.getBoard(),
                 movingPiece,
                 targetPos);
 
-        boolean extraTurn = room.getCurrentYutResult().isExtraTurn()
-                || moveType == MoveType.CATCH;
-
-        gameFlowService.addLog(
-                room,
-                "MOVE",
-                request.getPlayerId() + " moved " + movingPiece.getId()
-                        + " from " + fromPosition
-                        + " to " + targetPos
-                        + " (" + moveType + ")");
+        boolean extraTurn = moveType == MoveType.CATCH;
 
         MoveResultResponse response = new MoveResultResponse();
         response.setPieceId(movingPiece.getId());
@@ -105,8 +105,11 @@ public class BoardController {
         response.setMoveType(moveType);
         response.setExtraTurn(extraTurn);
 
+        room.getPendingYutResults().remove(request.getYutResultIndex());
+
         if (boardService.isPlayerFinished(room.getBoard(), request.getPlayerId())) {
             gameFlowService.endGame(room, request.getPlayerId());
+
             response.setGameOver(true);
             response.setWinnerId(request.getPlayerId());
 
@@ -116,7 +119,7 @@ public class BoardController {
         response.setGameOver(false);
         response.setWinnerId(null);
 
-        gameFlowService.handleMoveResult(room, extraTurn);
+        gameFlowService.handleMoveResult(room);
 
         return ApiResponse.ok("Piece moved.", response);
     }
@@ -136,49 +139,62 @@ public class BoardController {
             return ApiResponse.fail("Not in YUT_MOVE phase.");
         }
 
-        if (room.getCurrentYutResult() == null) {
-            return ApiResponse.fail("No yut result.");
-        }
-
         List<Piece> pieces = room.getBoard().getPieces().get(playerId);
 
         if (pieces == null) {
             return ApiResponse.fail("Can not find the Player.");
         }
 
-        List<MoveOption> options = new ArrayList<>();
-
-        for (Piece piece : pieces) {
-            if (piece.getCurrentPosition() == 99) {
-                continue;
-            }
-
-            // 다른 말에게 업혀 있는 말은 단독 이동 불가
-            if (piece.getCarriedByPieceId() != null) {
-                continue;
-            }
-
-            int targetPosition = boardService.calculateNextPath(
-                    room.getBoard(),
-                    piece.getCurrentPosition(),
-                    room.getCurrentYutResult().getMove());
-
-            MoveType moveType = boardService.predictMoveType(
-                    room.getBoard(),
-                    piece,
-                    targetPosition);
-
-            MoveOption option = new MoveOption(
-                    piece.getId(),
-                    piece.getCurrentPosition(),
-                    targetPosition,
-                    targetPosition == 99,
-                    moveType);
-
-            options.add(option);
+        if (room.getPendingYutResults() == null || room.getPendingYutResults().isEmpty()) {
+            return ApiResponse.fail("No pending yut results.");
         }
 
-        MoveListResponse response = new MoveListResponse(options);
+        List<MoveGroup> moveGroups = new ArrayList<>();
+
+        for (int i = 0; i < room.getPendingYutResults().size(); i++) {
+            YutResult yutResult = room.getPendingYutResults().get(i);
+
+            List<MoveOption> options = new ArrayList<>();
+
+            for (Piece piece : pieces) {
+                if (piece.getCurrentPosition() == 99) {
+                    continue;
+                }
+
+                if (piece.getCarriedByPieceId() != null) {
+                    continue;
+                }
+
+                int targetPosition = boardService.calculateNextPath(
+                        room.getBoard(),
+                        piece.getCurrentPosition(),
+                        yutResult.getMove());
+
+                MoveType moveType = boardService.predictMoveType(
+                        room.getBoard(),
+                        piece,
+                        targetPosition);
+
+                MoveOption option = new MoveOption(
+                        piece.getId(),
+                        piece.getCurrentPosition(),
+                        targetPosition,
+                        targetPosition == 99,
+                        moveType);
+
+                options.add(option);
+            }
+
+            MoveGroup group = new MoveGroup(
+                    i,
+                    yutResult.getResult(),
+                    yutResult.getMove(),
+                    options);
+
+            moveGroups.add(group);
+        }
+
+        MoveListResponse response = new MoveListResponse(moveGroups);
 
         return ApiResponse.ok("Move list loaded.", response);
     }

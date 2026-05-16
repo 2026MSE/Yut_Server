@@ -21,7 +21,7 @@ public class GameRoom {
 
     // 방장 아이디
     private String hostId;
-    
+
     // 게임로그 리스트
     private List<GameLog> logs = new ArrayList<>();
 
@@ -56,6 +56,9 @@ public class GameRoom {
     // 챌린지 정보
     private String firstChallengerId;
     private List<String> challengeQueue = new ArrayList<>();
+
+    // 윷 결과 누적(실제 이동 가능 결과)
+    private List<YutResult> pendingYutResults = new ArrayList<>();
 
     // 영준 추가
     private Board board = new Board();

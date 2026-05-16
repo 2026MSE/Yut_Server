@@ -25,8 +25,8 @@ public class GameFlowService {
     private BoardService boardService;
 
     public void addLog(GameRoom room, String type, String message) {
-    room.getLogs().add(new GameLog(type, message));
-}
+        room.getLogs().add(new GameLog(type, message));
+    }
 
     public void startPrivateThrowPhase(GameRoom room) {
 
@@ -60,28 +60,23 @@ public class GameFlowService {
             return;
         }
 
-        // 챌린지가 없으면 바로 이동 단계로 전환
         if (room.getFirstChallengerId() == null) {
-            room.setChallengeResolved(true);
-            startMovePhase(room);
+            addLog(room, "JUDGE", "No challenge. Result accepted.");
+            proceedAfterThrowResolved(room);
             return;
         }
 
-        // 챌린지가 있으면 서버가 자동 판정
         JudgeResult judgeResult = hallService.judgeChallenge(room);
 
         addLog(room, "JUDGE", "Challenge result: " + judgeResult);
 
         if (judgeResult == JudgeResult.CHALLENGE_FAIL) {
-            // 챌린저가 틀렸으므로 챌린저의 말 하나를 시작점으로 되돌림
             boardService.sendFirstPieceToStart(
                     room.getBoard(),
                     room.getFirstChallengerId());
         }
 
-        // CHALLENGE_SUCCESS인 경우는 이후 ChanceCard에서 보상 처리 예정
-        room.setChallengeResolved(true);
-        startMovePhase(room);
+        proceedAfterThrowResolved(room);
     }
 
     public void startMovePhase(GameRoom room) {
@@ -109,11 +104,38 @@ public class GameFlowService {
         room.setTurnPhase(TurnPhase.PRIVATE_THROW);
     }
 
-    public void handleMoveResult(GameRoom room, boolean extraTurn) {
+    public void addCurrentResultToPending(GameRoom room) {
+        if (room.getCurrentYutResult() == null) {
+            return;
+        }
 
-        if (extraTurn) {
-            handleExtraTurn(room);
+        room.getPendingYutResults().add(room.getCurrentYutResult());
+    }
+
+    public boolean shouldContinueThrow(GameRoom room) {
+        if (room.getCurrentYutResult() == null) {
+            return false;
+        }
+
+        return room.getCurrentYutResult().isExtraTurn();
+    }
+
+    public void proceedAfterThrowResolved(GameRoom room) {
+        addCurrentResultToPending(room);
+
+        room.setChallengeResolved(true);
+
+        if (shouldContinueThrow(room)) {
+            resetThrowState(room);
+            room.setTurnPhase(TurnPhase.PRIVATE_THROW);
         } else {
+            startMovePhase(room);
+        }
+    }
+
+    public void handleMoveResult(GameRoom room) {
+
+        if (room.getPendingYutResults().isEmpty()) {
             finishMovePhase(room);
         }
     }

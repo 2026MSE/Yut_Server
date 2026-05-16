@@ -21,7 +21,7 @@ public class GameStateAssembler {
         GameStateResponse response = new GameStateResponse();
 
         response.setLogs(room.getLogs());
-        
+
         response.setRoomInfo(roomService.toRoomInfo(room));
         response.setTurnInfo(room.getTurnInfo());
         response.setPlayers(playerService.getPlayerInfoByIds(room.getPlayerIds()));
@@ -56,6 +56,8 @@ public class GameStateAssembler {
 
         response.setFirstChallenger(room.getFirstChallengerId());
         response.setChallengeQueue(room.getChallengeQueue());
+
+        response.setPendingYutResults(room.getPendingYutResults());
 
         response.setWinnerId(room.getWinnerId());
 

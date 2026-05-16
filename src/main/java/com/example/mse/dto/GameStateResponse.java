@@ -27,6 +27,7 @@ public class GameStateResponse {
     private List<String> challengeQueue;
 
     private YutResult currentYutResult;
+    private List<YutResult> pendingYutResults;
 
     private long challengeDeadlineMillis;
     private long serverTimeMillis;

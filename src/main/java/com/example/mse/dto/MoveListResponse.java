@@ -9,9 +9,9 @@ import java.util.List;
 @Setter
 public class MoveListResponse {
 
-    private List<MoveOption> movablePieces;
+    private List<MoveGroup> moveGroups;
 
-    public MoveListResponse(List<MoveOption> movablePieces) {
-        this.movablePieces = movablePieces;
+    public MoveListResponse(List<MoveGroup> moveGroups) {
+        this.moveGroups = moveGroups;
     }
 }
