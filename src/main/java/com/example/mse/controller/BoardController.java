@@ -96,26 +96,35 @@ public class BoardController {
                 movingPiece,
                 targetPos);
 
-        boolean extraTurn = moveType == MoveType.CATCH;
-
         MoveResultResponse response = new MoveResultResponse();
         response.setPieceId(movingPiece.getId());
         response.setFromPosition(fromPosition);
         response.setToPosition(targetPos);
         response.setMoveType(moveType);
-        response.setExtraTurn(extraTurn);
 
         room.getPendingYutResults().remove(request.getYutResultIndex());
 
         if (boardService.isPlayerFinished(room.getBoard(), request.getPlayerId())) {
             gameFlowService.endGame(room, request.getPlayerId());
 
+            response.setExtraTurn(false);
             response.setGameOver(true);
             response.setWinnerId(request.getPlayerId());
 
             return ApiResponse.ok("Game over. Winner: " + request.getPlayerId(), response);
         }
 
+        if (moveType == MoveType.CATCH) {
+            gameFlowService.startCatchBonusThrow(room);
+
+            response.setExtraTurn(true);
+            response.setGameOver(false);
+            response.setWinnerId(null);
+
+            return ApiResponse.ok("Piece moved. Catch bonus throw.", response);
+        }
+
+        response.setExtraTurn(false);
         response.setGameOver(false);
         response.setWinnerId(null);
 

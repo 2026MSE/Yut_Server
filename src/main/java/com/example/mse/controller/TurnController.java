@@ -46,12 +46,25 @@ public class TurnController {
 
         ThrowResponse response = yutService.getThrowResponse(room);
 
+        if (room.getTurnPhase() == TurnPhase.CATCH_BONUS_THROW) {
+            gameFlowService.resolveCatchBonusThrow(room);
+
+            gameFlowService.addLog(
+                    room,
+                    "CATCH_BONUS_THROW",
+                    request.getPlayerId() + " received bonus throw: "
+                            + response.getYutResult().getResult());
+
+            return ApiResponse.ok("Catch bonus yut thrown.", response);
+        }
+
         gameFlowService.startDeclarePhase(room);
 
         gameFlowService.addLog(
                 room,
                 "THROW",
-                request.getPlayerId() + " threw yut: " + response.getYutResult().getResult());
+                request.getPlayerId() + " threw yut: "
+                        + response.getYutResult().getResult());
 
         return ApiResponse.ok("Yut thrown.", response);
     }

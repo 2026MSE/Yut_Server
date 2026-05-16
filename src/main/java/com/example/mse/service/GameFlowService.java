@@ -179,4 +179,15 @@ public class GameFlowService {
         resetThrowState(room);
         resetChallengeState(room);
     }
+
+    public void startCatchBonusThrow(GameRoom room) {
+        resetThrowState(room);
+        room.setTurnPhase(TurnPhase.CATCH_BONUS_THROW);
+    }
+
+    public void resolveCatchBonusThrow(GameRoom room) {
+        addCurrentResultToPending(room);
+        resetThrowState(room);
+        room.setTurnPhase(TurnPhase.YUT_MOVE);
+    }
 }
