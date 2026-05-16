@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 
 import com.example.mse.model.GameLog;
 import com.example.mse.model.StickSide;
@@ -25,6 +26,7 @@ public class GameStateResponse {
     private StickSide[] declaredPrivateSticks;
     private String firstChallenger;
     private List<String> challengeQueue;
+    private Map<String, Boolean> challengeVotes;
 
     private YutResult currentYutResult;
     private List<YutResult> pendingYutResults;

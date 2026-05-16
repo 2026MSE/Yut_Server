@@ -15,19 +15,25 @@ public class HallService {
         room.setDeclaredPrivateSticks(new StickSide[] { s1, s2 });
     }
 
-    public String challenge(GameRoom room, String playerId) {
+    public String voteChallenge(GameRoom room, String playerId, boolean challenge) {
 
         if (System.currentTimeMillis() > room.getChallengeDeadlineMillis()) {
             return "Challenge time is over.";
         }
 
-        if (room.getFirstChallengerId() == null) {
+        room.getChallengeVotes().put(playerId, challenge);
+
+        if (challenge) {
             room.setFirstChallengerId(playerId);
-            room.getChallengeQueue().add(playerId);
-            return "You are the first challenger.";
+
+            if (!room.getChallengeQueue().contains(playerId)) {
+                room.getChallengeQueue().add(playerId);
+            }
+
+            return "Challenge voted: O";
         }
 
-        return "Too late. First challenger is " + room.getFirstChallengerId();
+        return "Challenge voted: X";
     }
 
     public JudgeResult judgeChallenge(GameRoom room) {

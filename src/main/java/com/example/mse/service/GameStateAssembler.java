@@ -56,6 +56,7 @@ public class GameStateAssembler {
 
         response.setFirstChallenger(room.getFirstChallengerId());
         response.setChallengeQueue(room.getChallengeQueue());
+        response.setChallengeVotes(room.getChallengeVotes());
 
         response.setPendingYutResults(room.getPendingYutResults());
 

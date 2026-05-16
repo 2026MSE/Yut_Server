@@ -40,10 +40,32 @@ public class GameFlowService {
 
     public void startChallengePhase(GameRoom room) {
         room.setTurnPhase(TurnPhase.MAIN_HALL_CHALLENGE);
+
         room.setFirstChallengerId(null);
         room.getChallengeQueue().clear();
+        room.getChallengeVotes().clear();
+
         room.setChallengeResolved(false);
-        room.setChallengeDeadlineMillis(System.currentTimeMillis() + 5000);
+        room.setChallengeDeadlineMillis(System.currentTimeMillis() + 60000);
+
+    }
+
+    private boolean allNonTurnPlayersVotedX(GameRoom room) {
+        String turnPlayerId = room.getTurnInfo().getCurrentTurnPlayerId();
+
+        for (String playerId : room.getPlayerIds()) {
+            if (playerId.equals(turnPlayerId)) {
+                continue;
+            }
+
+            Boolean vote = room.getChallengeVotes().get(playerId);
+
+            if (vote == null || vote) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void resolveChallengeTimeout(GameRoom room) {
@@ -56,16 +78,25 @@ public class GameFlowService {
             return;
         }
 
-        if (System.currentTimeMillis() < room.getChallengeDeadlineMillis()) {
+        boolean timeOver = System.currentTimeMillis() >= room.getChallengeDeadlineMillis();
+
+        boolean challengerExists = room.getFirstChallengerId() != null;
+
+        boolean allVotedX = allNonTurnPlayersVotedX(room);
+
+        // O도 없고, 전원 X도 아니고, 시간도 안 지났으면 계속 대기
+        if (!challengerExists && !allVotedX && !timeOver) {
             return;
         }
 
-        if (room.getFirstChallengerId() == null) {
+        // 챌린저가 없으면 선언 인정
+        if (!challengerExists) {
             addLog(room, "JUDGE", "No challenge. Result accepted.");
             proceedAfterThrowResolved(room);
             return;
         }
 
+        // O를 누른 사람이 있으면 즉시 judge
         JudgeResult judgeResult = hallService.judgeChallenge(room);
 
         addLog(room, "JUDGE", "Challenge result: " + judgeResult);

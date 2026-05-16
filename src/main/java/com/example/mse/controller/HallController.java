@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.mse.dto.ApiResponse;
+import com.example.mse.dto.ChallengeVoteRequest;
 import com.example.mse.dto.DeclareRequest;
 import com.example.mse.dto.GameActionRequest;
 import com.example.mse.model.GameRoom;
@@ -72,24 +73,25 @@ public class HallController {
     }
 
     @PostMapping("/challenge")
-    public Object challenge(@RequestBody GameActionRequest request) {
+    public Object challenge(@RequestBody ChallengeVoteRequest request) {
 
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (turnService.isTurnPlayer(room, request.getPlayerId())) {
-            return ApiResponse.fail("Turn player cannot challenge");
+            return ApiResponse.fail("Turn player cannot vote challenge.");
         }
 
         if (room.getTurnPhase() != TurnPhase.MAIN_HALL_CHALLENGE) {
             return ApiResponse.fail("Not in MAIN_HALL_CHALLENGE phase.");
         }
 
-        String result = hallService.challenge(room, request.getPlayerId());
-
-        gameFlowService.addLog(
+        String result = hallService.voteChallenge(
                 room,
-                "CHALLENGE",
-                request.getPlayerId() + " challenged.");
+                request.getPlayerId(),
+                request.isChallenge());
+
+        // O를 눌렀거나, 모두 X를 눌렀으면 여기서 바로 resolve됨
+        gameFlowService.resolveChallengeTimeout(room);
 
         return ApiResponse.ok(result, null);
     }

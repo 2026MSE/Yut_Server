@@ -1,7 +1,9 @@
 package com.example.mse.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.example.mse.dto.TurnInfo;
 
@@ -56,6 +58,7 @@ public class GameRoom {
     // 챌린지 정보
     private String firstChallengerId;
     private List<String> challengeQueue = new ArrayList<>();
+    private Map<String, Boolean> challengeVotes = new HashMap<>();
 
     // 윷 결과 누적(실제 이동 가능 결과)
     private List<YutResult> pendingYutResults = new ArrayList<>();
