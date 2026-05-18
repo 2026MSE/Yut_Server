@@ -17,6 +17,10 @@ public class YutService {
 
     public YutResult getResult(GameRoom room) {
 
+        if (room.getCurrentYutResult() != null) {
+            return room.getCurrentYutResult();
+        }
+
         StickSide[] sticks = generateSticks();
 
         room.setSticks(sticks);
