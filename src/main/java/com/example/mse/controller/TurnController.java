@@ -40,13 +40,16 @@ public class TurnController {
             return ApiResponse.fail("Not your turn.");
         }
 
-        if (room.getTurnPhase() != TurnPhase.PRIVATE_THROW) {
-            return ApiResponse.fail("Not in PRIVATE_THROW phase.");
+        boolean isPrivateThrow = room.getTurnPhase() == TurnPhase.PRIVATE_THROW;
+        boolean isCatchBonusThrow = room.getTurnPhase() == TurnPhase.CATCH_BONUS_THROW;
+
+        if (!isPrivateThrow && !isCatchBonusThrow) {
+            return ApiResponse.fail("Not in throwable phase.");
         }
 
         ThrowResponse response = yutService.getThrowResponse(room);
 
-        if (room.getTurnPhase() == TurnPhase.CATCH_BONUS_THROW) {
+        if (isCatchBonusThrow) {
             gameFlowService.resolveCatchBonusThrow(room);
 
             gameFlowService.addLog(
