@@ -18,6 +18,9 @@ public class JudgeResponse {
 
     private JudgeResult judgeResult;
 
+    private String challengerId;
+    private String turnPlayerId;
+    
     private StickSide[] actualPrivateSticks;
     private StickSide[] declaredPrivateSticks;
     private StickSide[] publicSticks;

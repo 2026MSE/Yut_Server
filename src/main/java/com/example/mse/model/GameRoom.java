@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.example.mse.dto.JudgeResponse;
 import com.example.mse.dto.TurnInfo;
 
 import lombok.Getter;
@@ -67,6 +68,8 @@ public class GameRoom {
     private Board board = new Board();
 
     private String winnerId;
+
+    private JudgeResponse lastJudgeResponse;
 
     private long challengeDeadlineMillis;
     private boolean challengeResolved = false;

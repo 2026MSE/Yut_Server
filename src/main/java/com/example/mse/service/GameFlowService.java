@@ -3,9 +3,11 @@ package com.example.mse.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.mse.dto.JudgeResponse;
 import com.example.mse.dto.JudgeResponse.JudgeResult;
 import com.example.mse.model.GameLog;
 import com.example.mse.model.GameRoom;
+import com.example.mse.model.Piece;
 import com.example.mse.model.TurnPhase;
 
 @Service
@@ -44,9 +46,10 @@ public class GameFlowService {
         room.getChallengeQueue().clear();
         room.getChallengeVotes().clear();
 
+        room.setLastJudgeResponse(null);
+
         room.setChallengeResolved(false);
         room.setChallengeDeadlineMillis(System.currentTimeMillis() + 60000);
-
     }
 
     private boolean allNonTurnPlayersVotedX(GameRoom room) {
@@ -90,21 +93,42 @@ public class GameFlowService {
 
         // 챌린저가 없으면 선언 인정
         if (!challengerExists) {
+            room.setLastJudgeResponse(null);
             addLog(room, "JUDGE", "No challenge. Result accepted.");
             proceedAfterThrowResolved(room);
             return;
         }
 
-        // O를 누른 사람이 있으면 즉시 judge
         JudgeResult judgeResult = hallService.judgeChallenge(room);
+
+        JudgeResponse response = new JudgeResponse();
+        response.setJudgeResult(judgeResult);
+        response.setActualPrivateSticks(room.getPrivateSticks());
+        response.setDeclaredPrivateSticks(room.getDeclaredPrivateSticks());
+        response.setPublicSticks(room.getPublicSticks());
+        response.setActualResult(room.getCurrentYutResult());
+        response.setChallengerId(room.getFirstChallengerId());
+        response.setTurnPlayerId(room.getTurnInfo().getCurrentTurnPlayerId());
 
         addLog(room, "JUDGE", "Challenge result: " + judgeResult);
 
-        if (judgeResult == JudgeResult.CHALLENGE_FAIL) {
-            boardService.sendFirstPieceToStart(
+        if (judgeResult == JudgeResult.CHALLENGE_SUCCESS) {
+            response.setRewardChanceCard(true);
+            response.setPenaltyApplied(false);
+        } else {
+            Piece penaltyPiece = boardService.sendFirstPieceToStart(
                     room.getBoard(),
                     room.getFirstChallengerId());
+
+            response.setRewardChanceCard(false);
+            response.setPenaltyApplied(penaltyPiece != null);
+
+            if (penaltyPiece != null) {
+                response.setPenaltyPieceId(penaltyPiece.getId());
+            }
         }
+
+        room.setLastJudgeResponse(response);
 
         proceedAfterThrowResolved(room);
     }

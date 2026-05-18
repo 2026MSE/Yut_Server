@@ -90,6 +90,7 @@ public class GameStateAssembler {
         }
 
         response.setWinnerId(room.getWinnerId());
+        response.setLastJudgeResponse(room.getLastJudgeResponse());
 
         return response;
     }
