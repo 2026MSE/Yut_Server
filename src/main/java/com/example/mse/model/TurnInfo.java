@@ -1,4 +1,4 @@
-package com.example.mse.dto;
+package com.example.mse.model;
 
 import java.util.*;
 import lombok.*;

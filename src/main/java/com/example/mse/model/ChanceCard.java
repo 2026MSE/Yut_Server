@@ -1,4 +1,4 @@
-package com.example.mse.dto;
+package com.example.mse.model;
 
 public enum ChanceCard {
     EXTRA_THROW,      // 윷 한 번 더 던지기
