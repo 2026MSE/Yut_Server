@@ -33,7 +33,7 @@ public class GameController {
 
                 GameRoom room = roomService.requireRoom(roomId);
 
-                gameFlowService.resolveChallengeTimeout(room);
+                gameFlowService.resolveChallengeIfReady(room);
 
                 GameStateResponse response = gameStateAssembler.build(room, playerId);
 

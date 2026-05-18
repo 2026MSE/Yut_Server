@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.mse.dto.JudgeResponse;
-import com.example.mse.dto.TurnInfo;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -40,7 +39,16 @@ public class GameRoom {
     // 윷 정보
     private StickSide[] sticks = new StickSide[4];
 
+    // 현재 턴에서 비공개 윷 개수
+    private int privateStickCount = 2;
+
     public StickSide[] getPrivateSticks() {
+        if (privateStickCount == 1) {
+            return new StickSide[] {
+                    sticks[0]
+            };
+        }
+
         return new StickSide[] {
                 sticks[0],
                 sticks[1]
@@ -48,6 +56,14 @@ public class GameRoom {
     }
 
     public StickSide[] getPublicSticks() {
+        if (privateStickCount == 1) {
+            return new StickSide[] {
+                    sticks[1],
+                    sticks[2],
+                    sticks[3]
+            };
+        }
+
         return new StickSide[] {
                 sticks[2],
                 sticks[3]
@@ -55,6 +71,9 @@ public class GameRoom {
     }
 
     private StickSide[] declaredPrivateSticks;
+
+    // 효과 목록
+    private List<PlayerEffect> effects = new ArrayList<>();
 
     // 챌린지 정보
     private String firstChallengerId;

@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.mse.dto.TurnInfo;
 import com.example.mse.model.GameRoom;
+import com.example.mse.model.TurnInfo;
 import com.example.mse.model.TurnPhase;
 
 @Service

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.example.mse.model.GameLog;
 import com.example.mse.model.StickSide;
+import com.example.mse.model.TurnInfo;
 import com.example.mse.model.TurnPhase;
 import com.example.mse.model.YutResult;
 
