@@ -219,7 +219,7 @@ public class BoardService {
             movingPiece.getCarriedPieces().clear();
 
             return MoveType.PIGGYBACK;
-            
+
         } else {
             board.getNodePiecesMap().putIfAbsent(-1, new ArrayList<>());
 
@@ -281,7 +281,7 @@ public class BoardService {
     }
 
     // 챌린지 실패 시, 해당 플레이어의 말 중 보드 위에 있는 대표 말 하나를 대기석(-1)으로 되돌림
-    public Piece sendFirstPieceToStart(Board board, String playerId) {
+    public Piece sendFirstPieceToWaitingArea(Board board, String playerId) {
         List<Piece> pieces = board.getPieces().get(playerId);
 
         if (pieces == null || pieces.isEmpty()) {

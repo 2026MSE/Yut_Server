@@ -90,7 +90,7 @@ public class HallController {
                 request.getPlayerId(),
                 request.isChallenge());
 
-        gameFlowService.resolveChallengeTimeout(room);
+        gameFlowService.resolveChallengeIfReady(room);
 
         return ApiResponse.ok(result, null);
     }

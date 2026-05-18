@@ -70,7 +70,7 @@ public class GameFlowService {
         return true;
     }
 
-    public void resolveChallengeTimeout(GameRoom room) {
+    public void resolveChallengeIfReady(GameRoom room) {
 
         if (room.getTurnPhase() != TurnPhase.MAIN_HALL_CHALLENGE) {
             return;
@@ -116,7 +116,7 @@ public class GameFlowService {
             response.setRewardChanceCard(true);
             response.setPenaltyApplied(false);
         } else {
-            Piece penaltyPiece = boardService.sendFirstPieceToStart(
+            Piece penaltyPiece = boardService.sendFirstPieceToWaitingArea(
                     room.getBoard(),
                     room.getFirstChallengerId());
 
