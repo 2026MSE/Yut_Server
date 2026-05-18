@@ -58,14 +58,18 @@ public class RoomService {
         GameRoom room = rooms.get(roomId);
 
         if (room == null) {
-            throw new RuntimeException("Room not found");
+            throw new RuntimeException("Room not found.");
         }
 
         if (room.isStarted()) {
-            throw new RuntimeException("Game already started");
+            throw new RuntimeException("Game already started.");
         }
 
         if (!room.getPlayerIds().contains(playerId)) {
+            if (room.getPlayerIds().size() >= 4) {
+                throw new RuntimeException("Room is full.");
+            }
+
             room.getPlayerIds().add(playerId);
         }
 
