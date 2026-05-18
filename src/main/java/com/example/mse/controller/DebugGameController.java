@@ -136,7 +136,7 @@ public class DebugGameController {
     /**
      * 챌린지 단계로 바로 세팅.
      *
-     * truth=true  → 실제 private sticks와 같은 선언. 챌린지하면 실패해야 함.
+     * truth=true → 실제 private sticks와 같은 선언. 챌린지하면 실패해야 함.
      * truth=false → 실제 private sticks와 다른 선언. 챌린지하면 성공해야 함.
      *
      * 이후 실제 API POST /hall/challenge 테스트 가능.
@@ -171,6 +171,8 @@ public class DebugGameController {
 
         gameFlowService.startChallengePhase(room);
 
+        room.setChallengeDeadlineMillis(System.currentTimeMillis() + 10 * 60 * 1000);
+
         gameFlowService.addLog(
                 room,
                 "DEBUG",
@@ -188,7 +190,7 @@ public class DebugGameController {
      * pendingYutResults에 원하는 윷 결과 하나를 넣는다.
      *
      * 이후 실제 API:
-     * GET  /board/moveList
+     * GET /board/moveList
      * POST /board/move
      * 테스트 가능.
      */
