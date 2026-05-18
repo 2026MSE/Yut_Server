@@ -48,19 +48,39 @@ public class HallController {
             return ApiResponse.fail("No yut result yet.");
         }
 
-        if (request.getS1() == null || request.getS2() == null) {
-            return ApiResponse.fail("Declared sticks are required.");
+        int privateStickCount = room.getPrivateStickCount();
+
+        if (privateStickCount == 2) {
+            if (request.getS1() == null || request.getS2() == null) {
+                return ApiResponse.fail("Two declared private sticks are required.");
+            }
+
+            if (request.getS1() == StickSide.TAIL) {
+                return ApiResponse.fail("Invalid declaration: first private stick cannot be TAIL.");
+            }
+
+            if (request.getS2() == StickSide.BACK) {
+                return ApiResponse.fail("Invalid declaration: second private stick cannot be BACK.");
+            }
+
+            hallService.declarePrivateSticks(room, request.getS1(), request.getS2());
         }
 
-        if (request.getS1() == StickSide.TAIL) {
-            return ApiResponse.fail("Invalid declaration: first private stick cannot be TAIL.");
+        else if (privateStickCount == 1) {
+            if (request.getS1() == null) {
+                return ApiResponse.fail("One declared private stick is required.");
+            }
+
+            if (request.getS1() == StickSide.TAIL) {
+                return ApiResponse.fail("Invalid declaration: first private stick cannot be TAIL.");
+            }
+
+            hallService.declarePrivateSticks(room, request.getS1());
         }
 
-        if (request.getS2() == StickSide.BACK) {
-            return ApiResponse.fail("Invalid declaration: second private stick cannot be BACK.");
+        else {
+            return ApiResponse.fail("Invalid private stick count.");
         }
-
-        hallService.declarePrivateSticks(room, request.getS1(), request.getS2());
 
         gameFlowService.startChallengePhase(room);
 

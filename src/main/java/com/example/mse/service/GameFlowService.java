@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.mse.dto.JudgeResponse;
 import com.example.mse.dto.JudgeResponse.JudgeResult;
+import com.example.mse.model.EffectType;
 import com.example.mse.model.GameLog;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Piece;
@@ -24,6 +25,9 @@ public class GameFlowService {
 
     @Autowired
     private BoardService boardService;
+
+    @Autowired
+    private EffectService effectService;
 
     public void addLog(GameRoom room, String type, String message) {
         room.getLogs().add(new GameLog(type, message));
@@ -115,16 +119,45 @@ public class GameFlowService {
         if (judgeResult == JudgeResult.CHALLENGE_SUCCESS) {
             response.setRewardChanceCard(true);
             response.setPenaltyApplied(false);
+            response.setPenaltyType(null);
+            response.setPenaltyPieceId(null);
+
         } else {
             Piece penaltyPiece = boardService.sendFirstPieceToWaitingArea(
                     room.getBoard(),
                     room.getFirstChallengerId());
 
             response.setRewardChanceCard(false);
-            response.setPenaltyApplied(penaltyPiece != null);
 
             if (penaltyPiece != null) {
+                response.setPenaltyApplied(true);
+                response.setPenaltyType("SEND_PIECE_TO_WAITING_AREA");
                 response.setPenaltyPieceId(penaltyPiece.getId());
+
+                addLog(
+                        room,
+                        "PENALTY",
+                        room.getFirstChallengerId()
+                                + "'s piece was sent back to waiting area.");
+
+            } else {
+                effectService.addEffect(
+                        room,
+                        EffectType.ONE_PRIVATE_STICK,
+                        room.getFirstChallengerId(),
+                        room.getTurnInfo().getCurrentTurnPlayerId(),
+                        1,
+                        0);
+
+                response.setPenaltyApplied(true);
+                response.setPenaltyType("ONE_PRIVATE_STICK");
+                response.setPenaltyPieceId(null);
+
+                addLog(
+                        room,
+                        "PENALTY",
+                        room.getFirstChallengerId()
+                                + " received ONE_PRIVATE_STICK penalty.");
             }
         }
 

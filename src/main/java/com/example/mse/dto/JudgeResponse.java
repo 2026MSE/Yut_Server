@@ -20,7 +20,7 @@ public class JudgeResponse {
 
     private String challengerId;
     private String turnPlayerId;
-    
+
     private StickSide[] actualPrivateSticks;
     private StickSide[] declaredPrivateSticks;
     private StickSide[] publicSticks;
@@ -29,6 +29,9 @@ public class JudgeResponse {
 
     // 챌린지 성공 시
     private boolean rewardChanceCard;
+
+    // 패널티 유형
+    private String penaltyType;
 
     // 챌린지 실패 시
     private boolean penaltyApplied;

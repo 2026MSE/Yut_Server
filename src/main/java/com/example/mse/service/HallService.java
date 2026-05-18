@@ -15,6 +15,10 @@ public class HallService {
         room.setDeclaredPrivateSticks(new StickSide[] { s1, s2 });
     }
 
+    public void declarePrivateSticks(GameRoom room, StickSide s1) {
+        room.setDeclaredPrivateSticks(new StickSide[] { s1 });
+    }
+
     public String voteChallenge(GameRoom room, String playerId, boolean challenge) {
 
         if (playerId == null) {

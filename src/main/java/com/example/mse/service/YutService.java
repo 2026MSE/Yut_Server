@@ -2,9 +2,11 @@ package com.example.mse.service;
 
 import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.mse.dto.ThrowResponse;
+import com.example.mse.model.EffectType;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.YutName;
@@ -15,11 +17,16 @@ public class YutService {
 
     private Random random = new Random();
 
+    @Autowired
+    private EffectService effectService;
+
     public YutResult getResult(GameRoom room) {
 
         if (room.getCurrentYutResult() != null) {
             return room.getCurrentYutResult();
         }
+
+        applyPrivateStickEffect(room);
 
         StickSide[] sticks = generateSticks();
 
@@ -125,5 +132,22 @@ public class YutService {
         response.setYutResult(yutResult);
 
         return response;
+    }
+
+    private void applyPrivateStickEffect(GameRoom room) {
+        String currentPlayerId = room.getTurnInfo().getCurrentTurnPlayerId();
+
+        if (currentPlayerId == null) {
+            room.setPrivateStickCount(2);
+            return;
+        }
+
+        if (effectService.hasEffect(room, currentPlayerId, EffectType.ONE_PRIVATE_STICK)) {
+            room.setPrivateStickCount(1);
+            effectService.consumeEffect(room, currentPlayerId, EffectType.ONE_PRIVATE_STICK);
+            return;
+        }
+
+        room.setPrivateStickCount(2);
     }
 }
