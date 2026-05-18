@@ -53,7 +53,7 @@ public class GameRoom {
         };
     }
 
-    private StickSide[] declaredPrivateSticks = new StickSide[2];
+    private StickSide[] declaredPrivateSticks;
 
     // 챌린지 정보
     private String firstChallengerId;

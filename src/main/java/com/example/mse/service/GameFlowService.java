@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import com.example.mse.dto.JudgeResponse.JudgeResult;
 import com.example.mse.model.GameLog;
 import com.example.mse.model.GameRoom;
-import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
 
 @Service
@@ -191,7 +190,7 @@ public class GameFlowService {
 
     private void resetThrowState(GameRoom room) {
         yutService.resetTurn(room);
-        room.setDeclaredPrivateSticks(new StickSide[2]);
+        room.setDeclaredPrivateSticks(null);
     }
 
     private void resetChallengeState(GameRoom room) {

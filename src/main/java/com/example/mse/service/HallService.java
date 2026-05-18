@@ -38,6 +38,11 @@ public class HallService {
 
     public JudgeResult judgeChallenge(GameRoom room) {
 
+        if (room.getDeclaredPrivateSticks() == null
+                || room.getDeclaredPrivateSticks().length != 2) {
+            throw new RuntimeException("Declared private sticks not found.");
+        }
+
         boolean truth = Arrays.equals(
                 room.getPrivateSticks(),
                 room.getDeclaredPrivateSticks());
