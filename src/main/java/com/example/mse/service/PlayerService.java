@@ -1,5 +1,6 @@
 package com.example.mse.service;
 
+import com.example.mse.model.ChanceCard;
 import com.example.mse.model.Player;
 
 import java.util.ArrayList;
@@ -43,13 +44,40 @@ public class PlayerService {
 
             info.setPlayerId(player.getId());
             info.setName(player.getName());
-            info.setCurrentEmoticon("");
             info.setProfileUrl(player.getProfileUrl());
-            
+
+            List<String> inventory = new ArrayList<>();
+
+            for (ChanceCard card : player.getInventory()) {
+                inventory.add(card.name());
+            }
+
+            info.setInventory(inventory);
+
             result.add(info);
         }
 
         return result;
     }
 
+    public ChanceCard giveRandomChanceCard(String playerId) {
+        Player player = players.get(playerId);
+
+        if (player == null) {
+            return null;
+        }
+
+        ChanceCard[] cards = ChanceCard.values();
+
+        if (cards.length == 0) {
+            return null;
+        }
+
+        int index = (int) (Math.random() * cards.length);
+        ChanceCard card = cards[index];
+
+        player.getInventory().add(card);
+
+        return card;
+    }
 }

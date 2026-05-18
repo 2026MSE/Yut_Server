@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.mse.dto.JudgeResponse;
 import com.example.mse.dto.JudgeResponse.JudgeResult;
+import com.example.mse.model.ChanceCard;
 import com.example.mse.model.EffectType;
 import com.example.mse.model.GameLog;
 import com.example.mse.model.GameRoom;
@@ -28,6 +29,9 @@ public class GameFlowService {
 
     @Autowired
     private EffectService effectService;
+
+    @Autowired
+    private PlayerService playerService;
 
     public void addLog(GameRoom room, String type, String message) {
         room.getLogs().add(new GameLog(type, message));
@@ -117,7 +121,24 @@ public class GameFlowService {
         addLog(room, "JUDGE", "Challenge result: " + judgeResult);
 
         if (judgeResult == JudgeResult.CHALLENGE_SUCCESS) {
-            response.setRewardChanceCard(true);
+            ChanceCard rewardCard = playerService.giveRandomChanceCard(
+                    room.getFirstChallengerId());
+
+            response.setRewardChanceCard(rewardCard != null);
+
+            if (rewardCard != null) {
+                response.setRewardCard(rewardCard.name());
+
+                addLog(
+                        room,
+                        "REWARD",
+                        room.getFirstChallengerId()
+                                + " received chance card: "
+                                + rewardCard.name());
+            } else {
+                response.setRewardCard(null);
+            }
+
             response.setPenaltyApplied(false);
             response.setPenaltyType(null);
             response.setPenaltyPieceId(null);

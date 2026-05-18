@@ -29,6 +29,7 @@ public class JudgeResponse {
 
     // 챌린지 성공 시
     private boolean rewardChanceCard;
+    private String rewardCard;
 
     // 패널티 유형
     private String penaltyType;
