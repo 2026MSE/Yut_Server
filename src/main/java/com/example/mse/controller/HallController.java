@@ -41,7 +41,7 @@ public class HallController {
     private BoardService boardService;
 
     @PostMapping("/declare")
-    public Object declare(@RequestBody DeclareRequest request) {
+    public ApiResponse<Void> declare(@RequestBody DeclareRequest request) {
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
         if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
@@ -50,6 +50,14 @@ public class HallController {
 
         if (room.getTurnPhase() != TurnPhase.MAIN_HALL_DECLARE) {
             return ApiResponse.fail("Not in MAIN_HALL_DECLARE phase.");
+        }
+
+        if (room.getCurrentYutResult() == null) {
+            return ApiResponse.fail("No yut result yet.");
+        }
+
+        if (request.getS1() == null || request.getS2() == null) {
+            return ApiResponse.fail("Declared sticks are required.");
         }
 
         if (request.getS1() == StickSide.TAIL) {
