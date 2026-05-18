@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.example.mse.model.GameLog;
 import com.example.mse.model.StickSide;
+import com.example.mse.model.TurnPhase;
 import com.example.mse.model.YutResult;
 
 @Getter
@@ -18,6 +19,7 @@ public class GameStateResponse {
 
     private RoomInfo roomInfo;
     private TurnInfo turnInfo;
+    private TurnPhase turnPhase;
     private BoardStatusResponse boardStatus;
     private List<PlayerInfo> players;
 

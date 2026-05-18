@@ -32,16 +32,12 @@ public class GameStateAssembler {
 
         response.setRoomInfo(roomService.toRoomInfo(room));
         response.setTurnInfo(room.getTurnInfo());
+        response.setTurnPhase(room.getTurnPhase());
         response.setPlayers(playerService.getPlayerInfoByIds(room.getPlayerIds()));
 
         BoardStatusResponse boardStatus = new BoardStatusResponse();
 
         boardStatus.setAllPieces(toPieceInfoMap(room.getBoard().getPieces()));
-
-        boardStatus.setCurrentTurnPlayerId(
-                room.getTurnInfo().getCurrentTurnPlayerId());
-
-        boardStatus.setTurnPhase(room.getTurnPhase());
 
         response.setBoardStatus(boardStatus);
 
