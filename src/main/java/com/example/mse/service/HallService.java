@@ -17,8 +17,26 @@ public class HallService {
 
     public String voteChallenge(GameRoom room, String playerId, boolean challenge) {
 
+        if (playerId == null) {
+            return "Player id is required.";
+        }
+
+        if (room.isChallengeResolved()) {
+            return "Challenge already resolved.";
+        }
+
+        if (room.getFirstChallengerId() != null) {
+            return "Challenge already made.";
+        }
+
         if (System.currentTimeMillis() > room.getChallengeDeadlineMillis()) {
             return "Challenge time is over.";
+        }
+
+        String turnPlayerId = room.getTurnInfo().getCurrentTurnPlayerId();
+
+        if (playerId.equals(turnPlayerId)) {
+            return "Turn player cannot vote challenge.";
         }
 
         room.getChallengeVotes().put(playerId, challenge);
