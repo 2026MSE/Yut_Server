@@ -32,7 +32,12 @@ public class RoomController {
 
     // 찬미 RoomInfo 관련 코드 수정
     @PostMapping("/create")
-    public Object createRoom(@RequestBody GameActionRequest request) {
+    public ApiResponse<RoomInfo> createRoom(@RequestBody GameActionRequest request) {
+
+        if (playerService.get(request.getPlayerId()) == null) {
+            return ApiResponse.fail("Player not found.");
+        }
+
         GameRoom room = roomService.createRoom(request.getPlayerId());
 
         return ApiResponse.ok(
@@ -41,7 +46,12 @@ public class RoomController {
     }
 
     @PostMapping("/join")
-    public Object joinRoom(@RequestBody GameActionRequest request) {
+    public ApiResponse<RoomInfo> joinRoom(@RequestBody GameActionRequest request) {
+
+        if (playerService.get(request.getPlayerId()) == null) {
+            return ApiResponse.fail("Player not found.");
+        }
+
         GameRoom room = roomService.joinRoom(
                 request.getRoomId(),
                 request.getPlayerId());
@@ -66,7 +76,7 @@ public class RoomController {
     }
 
     @PostMapping("/start")
-    public Object startRoom(@RequestBody GameActionRequest request) {
+    public ApiResponse<RoomInfo> startRoom(@RequestBody GameActionRequest request) {
 
         GameRoom roomBeforeStart = roomService.requireRoom(request.getRoomId());
 
@@ -95,7 +105,7 @@ public class RoomController {
     }
 
     @PostMapping("/leave")
-    public Object leaveRoom(@RequestBody GameActionRequest request) {
+    public ApiResponse<RoomInfo> leaveRoom(@RequestBody GameActionRequest request) {
         GameRoom room = roomService.leaveRoom(
                 request.getRoomId(),
                 request.getPlayerId());

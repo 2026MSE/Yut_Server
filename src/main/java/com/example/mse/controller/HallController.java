@@ -73,7 +73,7 @@ public class HallController {
     }
 
     @PostMapping("/challenge")
-    public Object challenge(@RequestBody ChallengeVoteRequest request) {
+    public ApiResponse<Void> challenge(@RequestBody ChallengeVoteRequest request) {
 
         GameRoom room = roomService.requireRoom(request.getRoomId());
 
@@ -90,7 +90,6 @@ public class HallController {
                 request.getPlayerId(),
                 request.isChallenge());
 
-        // O를 눌렀거나, 모두 X를 눌렀으면 여기서 바로 resolve됨
         gameFlowService.resolveChallengeTimeout(room);
 
         return ApiResponse.ok(result, null);
