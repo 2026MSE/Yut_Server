@@ -197,6 +197,7 @@ public class GameFlowService {
     private void resetChallengeState(GameRoom room) {
         room.setFirstChallengerId(null);
         room.getChallengeQueue().clear();
+        room.getChallengeVotes().clear();
         room.setChallengeResolved(false);
         room.setChallengeDeadlineMillis(0);
     }
