@@ -47,6 +47,13 @@ public class TurnService {
     }
 
     public boolean isTurnPlayer(GameRoom room, String playerId) {
-        return room.getTurnInfo().getCurrentTurnPlayerId().equals(playerId);
+        if (playerId == null) {
+            return false;
+        }
+
+        String currentTurnPlayerId = room.getTurnInfo().getCurrentTurnPlayerId();
+
+        return currentTurnPlayerId != null
+                && currentTurnPlayerId.equals(playerId);
     }
 }
