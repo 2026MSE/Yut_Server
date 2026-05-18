@@ -193,7 +193,7 @@ public class BoardService {
                 .computeIfAbsent(targetPos, k -> new ArrayList<>());
 
         if (targetPieces.isEmpty()) {
-            moveSinglePiece(board, movingPiece, targetPos);
+            movePieceGroup(board, movingPiece, targetPos);
             return MoveType.NORMAL;
         }
 
@@ -219,11 +219,9 @@ public class BoardService {
             movingPiece.getCarriedPieces().clear();
 
             return MoveType.PIGGYBACK;
+            
         } else {
             board.getNodePiecesMap().putIfAbsent(-1, new ArrayList<>());
-
-            // 먼저 이동하는 말을 기존 위치에서 제거
-            removeFromNode(board, movingPiece);
 
             // 잡힌 말과 업힌 말들을 대기석으로 이동
             targetPiece.setCurrentPosition(-1);
@@ -241,8 +239,8 @@ public class BoardService {
             // target 칸 비우기
             targetPieces.clear();
 
-            // 이동한 말을 target 칸에 추가
-            addToNode(board, movingPiece, targetPos);
+            // 이동한 말과 업힌 말들을 target 칸으로 이동
+            movePieceGroup(board, movingPiece, targetPos);
 
             return MoveType.CATCH;
         }
@@ -351,5 +349,16 @@ public class BoardService {
     private void moveSinglePiece(Board board, Piece piece, int targetPos) {
         removeFromNode(board, piece);
         addToNode(board, piece, targetPos);
+    }
+
+    private void movePieceGroup(Board board, Piece leader, int targetPos) {
+        // 대표 말 이동
+        moveSinglePiece(board, leader, targetPos);
+
+        // 대표 말이 업고 있는 말들도 같은 위치로 이동
+        for (Piece carried : leader.getCarriedPieces()) {
+            moveSinglePiece(board, carried, targetPos);
+            carried.setCarriedByPieceId(leader.getId());
+        }
     }
 }
