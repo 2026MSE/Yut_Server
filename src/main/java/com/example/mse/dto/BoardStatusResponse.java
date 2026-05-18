@@ -1,6 +1,5 @@
 package com.example.mse.dto;
 
-import com.example.mse.model.Piece;
 import com.example.mse.model.TurnPhase;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +11,7 @@ import java.util.Map;
 @Setter
 public class BoardStatusResponse {
 
-    private Map<String, List<Piece>> allPieces;
+    private Map<String, List<PieceInfo>> allPieces;
 
     private String currentTurnPlayerId;
 

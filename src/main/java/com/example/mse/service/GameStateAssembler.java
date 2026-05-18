@@ -1,11 +1,18 @@
 package com.example.mse.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.mse.dto.BoardStatusResponse;
 import com.example.mse.dto.GameStateResponse;
+import com.example.mse.dto.PieceInfo;
 import com.example.mse.model.GameRoom;
+import com.example.mse.model.Piece;
 import com.example.mse.model.TurnPhase;
 
 @Service
@@ -29,7 +36,7 @@ public class GameStateAssembler {
 
         BoardStatusResponse boardStatus = new BoardStatusResponse();
 
-        boardStatus.setAllPieces(room.getBoard().getPieces());
+        boardStatus.setAllPieces(toPieceInfoMap(room.getBoard().getPieces()));
 
         boardStatus.setCurrentTurnPlayerId(
                 room.getTurnInfo().getCurrentTurnPlayerId());
@@ -93,5 +100,37 @@ public class GameStateAssembler {
         response.setLastJudgeResponse(room.getLastJudgeResponse());
 
         return response;
+    }
+
+    private Map<String, List<PieceInfo>> toPieceInfoMap(Map<String, List<Piece>> piecesMap) {
+        Map<String, List<PieceInfo>> result = new HashMap<>();
+
+        for (Map.Entry<String, List<Piece>> entry : piecesMap.entrySet()) {
+            String playerId = entry.getKey();
+            List<Piece> pieces = entry.getValue();
+
+            List<PieceInfo> pieceInfos = new ArrayList<>();
+
+            for (Piece piece : pieces) {
+                List<String> carriedPieceIds = new ArrayList<>();
+
+                for (Piece carried : piece.getCarriedPieces()) {
+                    carriedPieceIds.add(carried.getId());
+                }
+
+                PieceInfo info = new PieceInfo(
+                        piece.getId(),
+                        piece.getOwnerId(),
+                        piece.getCurrentPosition(),
+                        piece.getCarriedByPieceId(),
+                        carriedPieceIds);
+
+                pieceInfos.add(info);
+            }
+
+            result.put(playerId, pieceInfos);
+        }
+
+        return result;
     }
 }
