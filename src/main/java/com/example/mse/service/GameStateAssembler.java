@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import com.example.mse.dto.BoardStatusResponse;
 import com.example.mse.dto.GameStateResponse;
 import com.example.mse.dto.PieceInfo;
+import com.example.mse.dto.PlayerEffectInfo;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Piece;
+import com.example.mse.model.PlayerEffect;
 import com.example.mse.model.TurnPhase;
 
 @Service
@@ -94,6 +96,7 @@ public class GameStateAssembler {
 
         response.setWinnerId(room.getWinnerId());
         response.setLastJudgeResponse(room.getLastJudgeResponse());
+        response.setActiveEffects(toEffectInfoList(room.getEffects()));
 
         return response;
     }
@@ -125,6 +128,25 @@ public class GameStateAssembler {
             }
 
             result.put(playerId, pieceInfos);
+        }
+
+        return result;
+    }
+
+    private List<PlayerEffectInfo> toEffectInfoList(List<PlayerEffect> effects) {
+        List<PlayerEffectInfo> result = new ArrayList<>();
+
+        for (PlayerEffect effect : effects) {
+            if (effect.getRemainingTurns() <= 0) {
+                continue;
+            }
+
+            result.add(new PlayerEffectInfo(
+                    effect.getType(),
+                    effect.getTargetPlayerId(),
+                    effect.getSourcePlayerId(),
+                    effect.getRemainingTurns(),
+                    effect.getValue()));
         }
 
         return result;
