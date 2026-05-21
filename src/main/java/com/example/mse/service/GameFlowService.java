@@ -102,8 +102,9 @@ public class GameFlowService {
         // 챌린저가 없으면 선언 인정
         if (!challengerExists) {
             room.setLastJudgeResponse(null);
+            room.setChallengeResolved(true);
             addLog(room, "JUDGE", "No challenge. Result accepted.");
-            proceedAfterThrowResolved(room);
+            room.setTurnPhase(TurnPhase.CHALLENGE_RESULT);
             return;
         }
 
@@ -183,8 +184,8 @@ public class GameFlowService {
         }
 
         room.setLastJudgeResponse(response);
-
-        proceedAfterThrowResolved(room);
+        room.setChallengeResolved(true);
+        room.setTurnPhase(TurnPhase.CHALLENGE_RESULT);
     }
 
     public void startMovePhase(GameRoom room) {
@@ -298,5 +299,13 @@ public class GameFlowService {
         addCurrentResultToPending(room);
         resetThrowState(room);
         room.setTurnPhase(TurnPhase.YUT_MOVE);
+    }
+
+    public void continueAfterChallengeResult(GameRoom room) {
+        if (room.getTurnPhase() != TurnPhase.CHALLENGE_RESULT) {
+            throw new RuntimeException("Not in challenge result phase.");
+        }
+
+        proceedAfterThrowResolved(room);
     }
 }

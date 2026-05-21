@@ -49,6 +49,7 @@ public class GameStateAssembler {
         boolean hasYutResult = room.getCurrentYutResult() != null;
 
         boolean isResultPublic = room.isChallengeResolved()
+                || room.getTurnPhase() == TurnPhase.CHALLENGE_RESULT
                 || room.getTurnPhase() == TurnPhase.YUT_MOVE
                 || room.getTurnPhase() == TurnPhase.YUT_MOVE_DONE
                 || room.getTurnPhase() == TurnPhase.TURN_END
@@ -82,7 +83,8 @@ public class GameStateAssembler {
         response.setChallengeQueue(room.getChallengeQueue());
         response.setChallengeVotes(room.getChallengeVotes());
 
-        boolean isPendingResultPublic = room.getTurnPhase() == TurnPhase.YUT_MOVE
+        boolean isPendingResultPublic = room.getTurnPhase() == TurnPhase.CHALLENGE_RESULT
+                || room.getTurnPhase() == TurnPhase.YUT_MOVE
                 || room.getTurnPhase() == TurnPhase.YUT_MOVE_DONE
                 || room.getTurnPhase() == TurnPhase.TURN_END
                 || room.getTurnPhase() == TurnPhase.GAME_OVER

@@ -114,4 +114,21 @@ public class HallController {
 
         return ApiResponse.ok(result, null);
     }
+
+    @PostMapping("/challenge/result/confirm")
+    public ApiResponse<Void> confirmChallengeResult(@RequestBody ChallengeVoteRequest request) {
+        GameRoom room = roomService.requireRoom(request.getRoomId());
+
+        if (room.getTurnPhase() != TurnPhase.CHALLENGE_RESULT) {
+            return ApiResponse.fail("Not in CHALLENGE_RESULT phase.");
+        }
+
+        if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
+            return ApiResponse.fail("Only turn player can confirm challenge result.");
+        }
+
+        gameFlowService.continueAfterChallengeResult(room);
+
+        return ApiResponse.ok("Challenge result confirmed.", null);
+    }
 }
