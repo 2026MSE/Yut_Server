@@ -60,14 +60,18 @@ public class HallService {
 
     public JudgeResult judgeChallenge(GameRoom room) {
 
-        if (room.getDeclaredPrivateSticks() == null
-                || room.getDeclaredPrivateSticks().length != 2) {
+        StickSide[] actual = room.getPrivateSticks();
+        StickSide[] declared = room.getDeclaredPrivateSticks();
+
+        if (declared == null) {
             throw new RuntimeException("Declared private sticks not found.");
         }
 
-        boolean truth = Arrays.equals(
-                room.getPrivateSticks(),
-                room.getDeclaredPrivateSticks());
+        if (actual.length != declared.length) {
+            throw new RuntimeException("Declared private stick count does not match actual private stick count.");
+        }
+
+        boolean truth = Arrays.equals(actual, declared);
 
         if (truth) {
             return JudgeResult.CHALLENGE_FAIL;

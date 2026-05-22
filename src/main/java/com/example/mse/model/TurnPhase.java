@@ -1,6 +1,7 @@
 package com.example.mse.model;
 
 public enum TurnPhase {
+
     WAITING, // 방 대기 중
 
     PRIVATE_THROW, // 턴 플레이어가 Private Room에서 윷 던지는 단계
@@ -18,4 +19,5 @@ public enum TurnPhase {
     TURN_END, // 턴 종료 처리 단계
     
     GAME_OVER // 게임 종료
+    
 }

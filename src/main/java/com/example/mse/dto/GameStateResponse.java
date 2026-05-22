@@ -40,4 +40,6 @@ public class GameStateResponse {
     private long serverTimeMillis;
 
     private String winnerId;
+    private List<PlayerEffectInfo> activeEffects;
+
 }
