@@ -36,7 +36,7 @@ public class RoomController {
     @Autowired
     private PlayerService playerService;
 
-    @GetMapping("/state")
+    @GetMapping("/info")
     public ApiResponse<RoomInfo> getRoominfo(@RequestParam String roomId) {
 
         RoomInfo result = roomService.toRoomInfo(roomService.requireRoom(roomId));
