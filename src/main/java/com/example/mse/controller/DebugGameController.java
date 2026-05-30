@@ -1,5 +1,6 @@
 package com.example.mse.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.GameStateResponse;
 import com.example.mse.dto.ThrowResponse;
 import com.example.mse.model.GameRoom;
+import com.example.mse.model.Piece;
 import com.example.mse.model.Player;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
@@ -186,6 +188,42 @@ public class DebugGameController {
     }
 
     /**
+     * 챌린지 결과 단계로 바로 세팅.
+     *
+     * yutName=YUT 또는 MO로 세팅한 뒤
+     * POST /hall/challenge/result/confirm 호출 시
+     * PRIVATE_THROW로 한 번 더 가는지 확인할 수 있다.
+     *
+     * yutName=DO, GAE, GEOL, BACK_DO로 세팅하면
+     * confirm 후 YUT_MOVE로 가야 한다.
+     */
+    @PostMapping("/ready-challenge-result")
+    public ApiResponse<GameStateResponse> readyChallengeResult(
+            @RequestParam(defaultValue = "YUT") YutName yutName,
+            @RequestParam(defaultValue = P1) String viewerId) {
+
+        GameRoom room = getOrCreateDebugGame();
+
+        resetThrowAndChallengeState(room);
+
+        YutResult result = createYutResult(yutName);
+
+        room.setCurrentYutResult(result);
+        room.setLastJudgeResponse(null);
+        room.setChallengeResolved(true);
+        room.setTurnPhase(TurnPhase.CHALLENGE_RESULT);
+
+        gameFlowService.addLog(
+                room,
+                "DEBUG",
+                "Ready challenge result. Yut result: " + yutName);
+
+        GameStateResponse response = gameStateAssembler.build(room, viewerId);
+
+        return ApiResponse.ok("Ready challenge result.", response);
+    }
+
+    /**
      * 이동 단계로 바로 세팅.
      * pendingYutResults에 원하는 윷 결과 하나를 넣는다.
      *
@@ -219,6 +257,114 @@ public class DebugGameController {
         GameStateResponse response = gameStateAssembler.build(room, viewerId);
 
         return ApiResponse.ok("Ready to move.", response);
+    }
+
+    /**
+     * 이동 단계로 바로 세팅하되,
+     * pendingYutResults에 여러 개의 윷 결과를 넣는다.
+     *
+     * 예:
+     * POST /debug/game/ready-to-move-multiple?yutNames=DO&yutNames=YUT&yutNames=GAE
+     *
+     * 이후 /board/move에서 yutResultIndex를 원하는 순서로 선택해서
+     * 서로 다른 말에게 이동권을 사용할 수 있는지 테스트한다.
+     */
+    @PostMapping("/ready-to-move-multiple")
+    public ApiResponse<GameStateResponse> readyToMoveMultiple(
+            @RequestParam List<YutName> yutNames,
+            @RequestParam(defaultValue = P1) String viewerId) {
+
+        GameRoom room = getOrCreateDebugGame();
+
+        resetThrowAndChallengeState(room);
+
+        room.getPendingYutResults().clear();
+
+        for (YutName yutName : yutNames) {
+            room.getPendingYutResults().add(createYutResult(yutName));
+        }
+
+        if (!room.getPendingYutResults().isEmpty()) {
+            room.setCurrentYutResult(
+                    room.getPendingYutResults().get(room.getPendingYutResults().size() - 1));
+        } else {
+            room.setCurrentYutResult(null);
+        }
+
+        room.setTurnPhase(TurnPhase.YUT_MOVE);
+
+        gameFlowService.addLog(
+                room,
+                "DEBUG",
+                "Ready to move multiple. Pending results: " + yutNames);
+
+        GameStateResponse response = gameStateAssembler.build(room, viewerId);
+
+        return ApiResponse.ok("Ready to move multiple.", response);
+    }
+
+    /**
+     * 특정 말의 위치를 강제로 변경한다.
+     *
+     * 잡기 테스트 예:
+     * 1. p2_piece_1을 1번 칸에 배치
+     * 2. p1이 DO로 p1_piece_1을 이동
+     * 3. p1_piece_1이 1번 칸으로 가면서 p2_piece_1을 잡아야 함
+     *
+     * 예:
+     * POST /debug/game/set-piece-position?playerId=p2&pieceId=p2_piece_1&position=1
+     */
+    @PostMapping("/set-piece-position")
+    public ApiResponse<GameStateResponse> setPiecePosition(
+            @RequestParam String playerId,
+            @RequestParam String pieceId,
+            @RequestParam int position,
+            @RequestParam(defaultValue = P1) String viewerId) {
+
+        GameRoom room = getOrCreateDebugGame();
+
+        List<Piece> pieces = room.getBoard().getPieces().get(playerId);
+
+        if (pieces == null) {
+            return ApiResponse.fail("Player pieces not found.");
+        }
+
+        Piece targetPiece = null;
+
+        for (Piece piece : pieces) {
+            if (piece.getId().equals(pieceId)) {
+                targetPiece = piece;
+                break;
+            }
+        }
+
+        if (targetPiece == null) {
+            return ApiResponse.fail("Piece not found.");
+        }
+
+        removePieceFromAllNodes(room, targetPiece);
+
+        // 디버그 강제 이동에서는 업기 관계를 초기화한다.
+        targetPiece.setCarriedByPieceId(null);
+        targetPiece.getCarriedPieces().clear();
+        targetPiece.setCurrentPosition(position);
+
+        room.getBoard()
+                .getNodePiecesMap()
+                .computeIfAbsent(position, k -> new ArrayList<>())
+                .add(targetPiece);
+
+        gameFlowService.addLog(
+                room,
+                "DEBUG",
+                "Piece position changed: "
+                        + pieceId
+                        + " -> "
+                        + position);
+
+        GameStateResponse response = gameStateAssembler.build(room, viewerId);
+
+        return ApiResponse.ok("Piece position changed.", response);
     }
 
     /**
@@ -330,6 +476,12 @@ public class DebugGameController {
         room.setChallengeResolved(false);
         room.setChallengeDeadlineMillis(0L);
         room.setLastJudgeResponse(null);
+    }
+
+    private void removePieceFromAllNodes(GameRoom room, Piece piece) {
+        for (List<Piece> nodePieces : room.getBoard().getNodePiecesMap().values()) {
+            nodePieces.remove(piece);
+        }
     }
 
     private StickSide flipFirstPrivateStick(StickSide stick) {

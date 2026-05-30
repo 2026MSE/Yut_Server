@@ -48,13 +48,24 @@ public class GameStateAssembler {
 
         boolean hasYutResult = room.getCurrentYutResult() != null;
 
+        boolean isPrivateThrowResultPhase = room.getTurnPhase() == TurnPhase.PRIVATE_THROW_RESULT;
+
+        boolean isCatchBonusThrowResultPhase = room.getTurnPhase() == TurnPhase.CATCH_BONUS_THROW_RESULT;
+
+        boolean isDeclareOrLater = room.getTurnPhase() == TurnPhase.MAIN_HALL_DECLARE
+                || room.getTurnPhase() == TurnPhase.MAIN_HALL_CHALLENGE
+                || room.getTurnPhase() == TurnPhase.CHALLENGE_RESULT
+                || room.getTurnPhase() == TurnPhase.YUT_MOVE
+                || room.getTurnPhase() == TurnPhase.YUT_MOVE_DONE
+                || room.getTurnPhase() == TurnPhase.TURN_END
+                || room.getTurnPhase() == TurnPhase.GAME_OVER;
+
         boolean isResultPublic = room.isChallengeResolved()
                 || room.getTurnPhase() == TurnPhase.CHALLENGE_RESULT
                 || room.getTurnPhase() == TurnPhase.YUT_MOVE
                 || room.getTurnPhase() == TurnPhase.YUT_MOVE_DONE
                 || room.getTurnPhase() == TurnPhase.TURN_END
-                || room.getTurnPhase() == TurnPhase.GAME_OVER
-                || room.getTurnPhase() == TurnPhase.CATCH_BONUS_THROW;
+                || room.getTurnPhase() == TurnPhase.GAME_OVER;
 
         if (hasYutResult && (isTurnPlayer || isResultPublic)) {
             response.setCurrentYutResult(room.getCurrentYutResult());
@@ -62,12 +73,23 @@ public class GameStateAssembler {
             response.setCurrentYutResult(null);
         }
 
-        if (hasYutResult) {
+        // PRIVATE_THROW_RESULT:
+        // 턴 플레이어만 publicSticks 확인
+        //
+        // MAIN_HALL_DECLARE 이후:
+        // 모두 publicSticks 확인
+        //
+        // CATCH_BONUS_THROW_RESULT:
+        // 잡기 보너스 결과 확인 중이므로 턴 플레이어만 publicSticks 확인
+        if (hasYutResult && isTurnPlayer) {
+            response.setPublicSticks(room.getPublicSticks());
+        } else if (hasYutResult && isDeclareOrLater && !isPrivateThrowResultPhase && !isCatchBonusThrowResultPhase) {
             response.setPublicSticks(room.getPublicSticks());
         } else {
             response.setPublicSticks(null);
         }
 
+        // privateSticks는 항상 턴 플레이어만 확인
         if (hasYutResult && isTurnPlayer) {
             response.setPrivateSticks(room.getPrivateSticks());
         } else {
@@ -87,8 +109,7 @@ public class GameStateAssembler {
                 || room.getTurnPhase() == TurnPhase.YUT_MOVE
                 || room.getTurnPhase() == TurnPhase.YUT_MOVE_DONE
                 || room.getTurnPhase() == TurnPhase.TURN_END
-                || room.getTurnPhase() == TurnPhase.GAME_OVER
-                || room.getTurnPhase() == TurnPhase.CATCH_BONUS_THROW;
+                || room.getTurnPhase() == TurnPhase.GAME_OVER;
 
         if (isPendingResultPublic || isTurnPlayer) {
             response.setPendingYutResults(room.getPendingYutResults());

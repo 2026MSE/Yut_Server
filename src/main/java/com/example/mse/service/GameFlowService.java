@@ -42,6 +42,38 @@ public class GameFlowService {
         room.setTurnPhase(TurnPhase.PRIVATE_THROW);
     }
 
+    public void startPrivateThrowResultPhase(GameRoom room) {
+        room.setTurnPhase(TurnPhase.PRIVATE_THROW_RESULT);
+    }
+
+    public void startCatchBonusThrowResultPhase(GameRoom room) {
+        room.setTurnPhase(TurnPhase.CATCH_BONUS_THROW_RESULT);
+    }
+
+    public void exitPrivateThrowResult(GameRoom room) {
+        if (room.getTurnPhase() != TurnPhase.PRIVATE_THROW_RESULT) {
+            throw new RuntimeException("Not in PRIVATE_THROW_RESULT phase.");
+        }
+
+        if (room.getCurrentYutResult() == null) {
+            throw new RuntimeException("No yut result to confirm.");
+        }
+
+        startDeclarePhase(room);
+    }
+
+    public void exitCatchBonusThrowResult(GameRoom room) {
+        if (room.getTurnPhase() != TurnPhase.CATCH_BONUS_THROW_RESULT) {
+            throw new RuntimeException("Not in CATCH_BONUS_THROW_RESULT phase.");
+        }
+
+        if (room.getCurrentYutResult() == null) {
+            throw new RuntimeException("No catch bonus yut result to confirm.");
+        }
+
+        resolveCatchBonusThrow(room);
+    }
+
     public void startDeclarePhase(GameRoom room) {
 
         room.setTurnPhase(TurnPhase.MAIN_HALL_DECLARE);
@@ -297,7 +329,6 @@ public class GameFlowService {
 
     public void resolveCatchBonusThrow(GameRoom room) {
         addCurrentResultToPending(room);
-        resetThrowState(room);
         room.setTurnPhase(TurnPhase.YUT_MOVE);
     }
 

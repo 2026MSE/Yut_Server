@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.mse.dto.ApiResponse;
 import com.example.mse.dto.ChallengeVoteRequest;
 import com.example.mse.dto.DeclareRequest;
+import com.example.mse.dto.GameActionRequest;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
@@ -115,4 +116,20 @@ public class HallController {
         return ApiResponse.ok(result, null);
     }
 
+    @PostMapping("/challenge/result/confirm")
+    public ApiResponse<Void> confirmChallengeResult(@RequestBody GameActionRequest request) {
+        GameRoom room = roomService.requireRoom(request.getRoomId());
+
+        if (room.getTurnPhase() != TurnPhase.CHALLENGE_RESULT) {
+            return ApiResponse.fail("Not in CHALLENGE_RESULT phase.");
+        }
+
+        if (!turnService.isTurnPlayer(room, request.getPlayerId())) {
+            return ApiResponse.fail("Only turn player can confirm challenge result.");
+        }
+
+        gameFlowService.continueAfterChallengeResult(room);
+
+        return ApiResponse.ok("Challenge result confirmed.", null);
+    }
 }
