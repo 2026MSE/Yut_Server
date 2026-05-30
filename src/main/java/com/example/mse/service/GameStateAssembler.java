@@ -118,6 +118,7 @@ public class GameStateAssembler {
         }
 
         response.setWinnerId(room.getWinnerId());
+        response.setMoveHistory(room.getMoveHistory());
         response.setLastJudgeResponse(room.getLastJudgeResponse());
         response.setActiveEffects(toEffectInfoList(room.getEffects()));
 

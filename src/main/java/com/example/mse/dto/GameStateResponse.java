@@ -34,6 +34,8 @@ public class GameStateResponse {
     private YutResult currentYutResult;
     private List<YutResult> pendingYutResults;
 
+    private List<MoveResultResponse> moveHistory;
+
     private JudgeResponse lastJudgeResponse;
 
     private long challengeDeadlineMillis;

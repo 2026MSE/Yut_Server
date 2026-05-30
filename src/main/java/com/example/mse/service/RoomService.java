@@ -95,6 +95,9 @@ public class RoomService {
         room.setWinnerId(null);
         room.setTurnPhase(TurnPhase.WAITING);
 
+        room.setMoveSequence(0);
+        room.getMoveHistory().clear();
+
         room.setBoard(new Board());
 
         // 영준 추가

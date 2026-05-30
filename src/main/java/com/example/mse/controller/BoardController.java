@@ -111,6 +111,8 @@ public class BoardController {
             response.setGameOver(true);
             response.setWinnerId(request.getPlayerId());
 
+            gameFlowService.recordMoveResult(room, response, request.getPlayerId());
+
             return ApiResponse.ok("Game over. Winner: " + request.getPlayerId(), response);
         }
 
@@ -121,6 +123,8 @@ public class BoardController {
             response.setGameOver(false);
             response.setWinnerId(null);
 
+            gameFlowService.recordMoveResult(room, response, request.getPlayerId());
+
             return ApiResponse.ok("Piece moved. Catch bonus throw.", response);
         }
 
@@ -129,6 +133,8 @@ public class BoardController {
         response.setWinnerId(null);
 
         gameFlowService.handleMoveResult(room);
+
+        gameFlowService.recordMoveResult(room, response, request.getPlayerId());
 
         return ApiResponse.ok("Piece moved.", response);
     }

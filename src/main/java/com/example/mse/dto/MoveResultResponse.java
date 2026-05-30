@@ -9,6 +9,12 @@ import lombok.Setter;
 @Setter
 public class MoveResultResponse {
 
+    // 이동 이벤트 순번
+    private long moveSequence;
+
+    // 이 이동을 수행한 플레이어
+    private String playerId;
+
     private String pieceId;
 
     private int fromPosition;

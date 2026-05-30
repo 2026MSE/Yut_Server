@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.mse.dto.JudgeResponse;
 import com.example.mse.dto.JudgeResponse.JudgeResult;
+import com.example.mse.dto.MoveResultResponse;
 import com.example.mse.model.ChanceCard;
 import com.example.mse.model.EffectType;
 import com.example.mse.model.GameLog;
@@ -35,6 +36,15 @@ public class GameFlowService {
 
     public void addLog(GameRoom room, String type, String message) {
         room.getLogs().add(new GameLog(type, message));
+    }
+
+    public void recordMoveResult(GameRoom room, MoveResultResponse response, String playerId) {
+        room.setMoveSequence(room.getMoveSequence() + 1);
+
+        response.setMoveSequence(room.getMoveSequence());
+        response.setPlayerId(playerId);
+
+        room.getMoveHistory().add(response);
     }
 
     public void startPrivateThrowPhase(GameRoom room) {
