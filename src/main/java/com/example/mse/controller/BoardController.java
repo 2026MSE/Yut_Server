@@ -233,6 +233,8 @@ public class BoardController {
                     i,
                     yutResult.getResult(),
                     yutResult.getMove(),
+                    yutResult.getSource(),
+                    yutResult.getSourceCard(),
                     options);
 
             moveGroups.add(group);

@@ -61,6 +61,9 @@ public class YutService {
     private YutResult calculateResult(StickSide[] sticks) {
         YutResult result = new YutResult();
 
+        result.setSource("THROW");
+        result.setSourceCard(null);
+
         boolean hasBack = sticks[0] == StickSide.BACK;
 
         int backSideCount = 0;

@@ -80,4 +80,28 @@ public class PlayerService {
 
         return card;
     }
+
+    public boolean hasChanceCard(String playerId, ChanceCard card) {
+        Player player = players.get(playerId);
+
+        if (player == null) {
+            return false;
+        }
+
+        return player.getInventory().contains(card);
+    }
+
+    public void removeChanceCard(String playerId, ChanceCard card) {
+        Player player = players.get(playerId);
+
+        if (player == null) {
+            throw new RuntimeException("Player not found.");
+        }
+
+        boolean removed = player.getInventory().remove(card);
+
+        if (!removed) {
+            throw new RuntimeException("Chance card not found in inventory.");
+        }
+    }
 }

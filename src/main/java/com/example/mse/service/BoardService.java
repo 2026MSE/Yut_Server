@@ -315,6 +315,7 @@ public class BoardService {
 
             // 업고 있던 말들도 대기석으로 이동
             for (Piece carried : piece.getCarriedPieces()) {
+                removeFromNode(board, carried);
                 carried.setCarriedByPieceId(null);
                 addToNode(board, carried, -1);
             }
@@ -334,7 +335,7 @@ public class BoardService {
     private void removeFromNode(Board board, Piece piece) {
         int currentPos = piece.getCurrentPosition();
 
-        if (currentPos == -1 || currentPos == 99) {
+        if (currentPos == 99) {
             return;
         }
 
