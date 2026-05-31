@@ -278,6 +278,7 @@ public class GameFlowService {
 
         if (shouldContinueThrow(room)) {
             resetThrowState(room);
+            resetChallengeState(room);
             room.setTurnPhase(TurnPhase.PRIVATE_THROW);
         } else {
             startMovePhase(room);

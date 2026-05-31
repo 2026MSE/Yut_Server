@@ -1,5 +1,7 @@
 package com.example.mse.dto;
 
+import java.util.List;
+
 import com.example.mse.model.MoveType;
 
 import lombok.Getter;
@@ -16,6 +18,9 @@ public class MoveResultResponse {
     private String playerId;
 
     private String pieceId;
+
+    private List<String> movedPieceIds;
+    private List<String> caughtPieceIds;
 
     private int fromPosition;
     private int toPosition;
