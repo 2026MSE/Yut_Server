@@ -10,6 +10,7 @@ import com.example.mse.dto.RoomInfo;
 import com.example.mse.model.Board;
 import com.example.mse.model.BoardNode;
 import com.example.mse.model.GameRoom;
+import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
 
 @Service
@@ -87,6 +88,7 @@ public class RoomService {
     public GameRoom startRoom(String roomId) {
         GameRoom room = requireRoom(roomId);
 
+        // 최소 인원 체크는 나중에 복구할 예정
         // if (room.getPlayerIds().size() < 2) {
         // throw new RuntimeException("Need at least 2 players");
         // }
@@ -95,17 +97,33 @@ public class RoomService {
         room.setWinnerId(null);
         room.setTurnPhase(TurnPhase.WAITING);
 
+        // 새 게임 시작 전 이전 게임 상태 초기화
+        room.getLogs().clear();
+
+        room.setCurrentYutResult(null);
+        room.setSticks(new StickSide[4]);
+        room.setPrivateStickCount(2);
+        room.setDeclaredPrivateSticks(null);
+
+        room.getEffects().clear();
+
+        room.setFirstChallengerId(null);
+        room.getChallengeQueue().clear();
+        room.getChallengeVotes().clear();
+        room.setChallengeResolved(false);
+        room.setChallengeDeadlineMillis(0L);
+        room.setLastJudgeResponse(null);
+
+        room.getPendingYutResults().clear();
+
         room.setMoveSequence(0);
         room.getMoveHistory().clear();
 
         room.setBoard(new Board());
 
-        // 영준 추가
-        // 게임이 시작되면, BoardService에게 지도를 받아와서 방의 보드판에 장착합니다.
         Map<Integer, BoardNode> initialMap = boardService.initBoard();
         room.getBoard().setNodeMap(initialMap);
 
-        // 추가된 부분 2.플레이어한테 말 4개씩 쥐어주기
         boardService.initPieces(room.getBoard(), room.getPlayerIds());
 
         return room;
