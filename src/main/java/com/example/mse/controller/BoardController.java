@@ -91,6 +91,33 @@ public class BoardController {
                 movingPiece.getCurrentPosition(),
                 selectedResult.getMove());
 
+        // 실제 이동 전에 이동할 말 목록 저장
+        List<String> movedPieceIds = new ArrayList<>();
+        movedPieceIds.add(movingPiece.getId());
+
+        for (Piece carried : movingPiece.getCarriedPieces()) {
+            movedPieceIds.add(carried.getId());
+        }
+
+        // 실제 이동 전에 잡힐 말 목록 저장
+        List<String> caughtPieceIds = new ArrayList<>();
+
+        if (targetPos != -1 && targetPos != 99 && movingPiece.getCurrentPosition() != targetPos) {
+            List<Piece> targetPieces = room.getBoard().getNodePiecesMap().get(targetPos);
+
+            if (targetPieces != null && !targetPieces.isEmpty()) {
+                Piece targetPiece = targetPieces.get(0);
+
+                if (!targetPiece.getOwnerId().equals(movingPiece.getOwnerId())) {
+                    caughtPieceIds.add(targetPiece.getId());
+
+                    for (Piece carried : targetPiece.getCarriedPieces()) {
+                        caughtPieceIds.add(carried.getId());
+                    }
+                }
+            }
+        }
+
         MoveType moveType = boardService.movePieceAndCheckCatch(
                 room.getBoard(),
                 movingPiece,
@@ -98,6 +125,8 @@ public class BoardController {
 
         MoveResultResponse response = new MoveResultResponse();
         response.setPieceId(movingPiece.getId());
+        response.setMovedPieceIds(movedPieceIds);
+        response.setCaughtPieceIds(caughtPieceIds);
         response.setFromPosition(fromPosition);
         response.setToPosition(targetPos);
         response.setMoveType(moveType);

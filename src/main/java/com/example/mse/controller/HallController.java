@@ -111,6 +111,10 @@ public class HallController {
                 request.getPlayerId(),
                 request.isChallenge());
 
+        if (!result.startsWith("Challenge voted")) {
+            return ApiResponse.fail(result);
+        }
+
         gameFlowService.resolveChallengeIfReady(room);
 
         return ApiResponse.ok(result, null);
