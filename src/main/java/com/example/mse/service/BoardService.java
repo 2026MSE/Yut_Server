@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Service
 public class BoardService {
@@ -287,8 +288,8 @@ public class BoardService {
         return true;
     }
 
-    // 챌린지 실패 시, 해당 플레이어의 말 중 보드 위에 있는 대표 말 하나를 대기석(-1)으로 되돌림
-    public Piece sendFirstPieceToWaitingArea(Board board, String playerId) {
+    // 챌린지 실패 시, 해당 플레이어의 말 중 보드 위에 있는 대표 말 하나를 랜덤으로 대기석(-1)으로 되돌림
+    public Piece sendRandomPieceToWaitingArea(Board board, String playerId) {
         List<Piece> pieces = board.getPieces().get(playerId);
 
         if (pieces == null || pieces.isEmpty()) {
@@ -296,6 +297,8 @@ public class BoardService {
         }
 
         board.getNodePiecesMap().putIfAbsent(-1, new ArrayList<>());
+
+        List<Piece> candidates = new ArrayList<>();
 
         for (Piece piece : pieces) {
             int currentPos = piece.getCurrentPosition();
@@ -310,26 +313,32 @@ public class BoardService {
                 continue;
             }
 
-            // 대표말을 현재 노드에서 제거
-            removeFromNode(board, piece);
-
-            // 업고 있던 말들도 대기석으로 이동
-            for (Piece carried : piece.getCarriedPieces()) {
-                removeFromNode(board, carried);
-                carried.setCarriedByPieceId(null);
-                addToNode(board, carried, -1);
-            }
-
-            piece.getCarriedPieces().clear();
-
-            // 대표말도 대기석으로 이동
-            piece.setCarriedByPieceId(null);
-            addToNode(board, piece, -1);
-
-            return piece;
+            candidates.add(piece);
         }
 
-        return null;
+        if (candidates.isEmpty()) {
+            return null;
+        }
+
+        Piece selectedPiece = candidates.get(new Random().nextInt(candidates.size()));
+
+        // 대표말을 현재 노드에서 제거
+        removeFromNode(board, selectedPiece);
+
+        // 업고 있던 말들도 대기석으로 이동
+        for (Piece carried : selectedPiece.getCarriedPieces()) {
+            removeFromNode(board, carried);
+            carried.setCarriedByPieceId(null);
+            addToNode(board, carried, -1);
+        }
+
+        selectedPiece.getCarriedPieces().clear();
+
+        // 대표말도 대기석으로 이동
+        selectedPiece.setCarriedByPieceId(null);
+        addToNode(board, selectedPiece, -1);
+
+        return selectedPiece;
     }
 
     private void removeFromNode(Board board, Piece piece) {
