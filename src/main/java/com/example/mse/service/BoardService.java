@@ -158,6 +158,11 @@ public class BoardService {
             return MoveType.FINISH;
         }
 
+        // 대기석(-1) 또는 제자리 이동은 잡기/업기 판정 대상이 아님
+        if (targetPos == -1 || movingPiece.getCurrentPosition() == targetPos) {
+            return MoveType.NORMAL;
+        }
+
         List<Piece> targetPieces = board.getNodePiecesMap().get(targetPos);
 
         if (targetPieces == null || targetPieces.isEmpty()) {
@@ -187,6 +192,11 @@ public class BoardService {
             movingPiece.getCarriedPieces().clear();
 
             return MoveType.FINISH;
+        }
+
+        // 대기석(-1) 또는 제자리 이동은 실제 이동/잡기/업기 처리하지 않음
+        if (targetPos == -1 || movingPiece.getCurrentPosition() == targetPos) {
+            return MoveType.NORMAL;
         }
 
         List<Piece> targetPieces = board.getNodePiecesMap()
@@ -223,7 +233,6 @@ public class BoardService {
         } else {
             board.getNodePiecesMap().putIfAbsent(-1, new ArrayList<>());
 
-            // 잡힌 말과 업힌 말들을 대기석으로 이동
             targetPiece.setCurrentPosition(-1);
             targetPiece.setCarriedByPieceId(null);
             board.getNodePiecesMap().get(-1).add(targetPiece);
@@ -236,10 +245,8 @@ public class BoardService {
 
             targetPiece.getCarriedPieces().clear();
 
-            // target 칸 비우기
             targetPieces.clear();
 
-            // 이동한 말과 업힌 말들을 target 칸으로 이동
             movePieceGroup(board, movingPiece, targetPos);
 
             return MoveType.CATCH;
