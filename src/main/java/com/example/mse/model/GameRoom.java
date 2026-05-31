@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.mse.dto.JudgeResponse;
+import com.example.mse.dto.MoveResultResponse;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -79,9 +80,15 @@ public class GameRoom {
     private String firstChallengerId;
     private List<String> challengeQueue = new ArrayList<>();
     private Map<String, Boolean> challengeVotes = new HashMap<>();
-
+    
     // 윷 결과 누적(실제 이동 가능 결과)
     private List<YutResult> pendingYutResults = new ArrayList<>();
+
+    // 이동 이벤트 순번
+    private long moveSequence = 0;
+
+    // 모든 플레이어가 공유할 이동 기록
+    private List<MoveResultResponse> moveHistory = new ArrayList<>();
 
     // 영준 추가
     private Board board = new Board();
@@ -92,4 +99,5 @@ public class GameRoom {
 
     private long challengeDeadlineMillis;
     private boolean challengeResolved = false;
+
 }
