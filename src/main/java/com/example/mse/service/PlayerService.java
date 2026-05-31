@@ -104,4 +104,16 @@ public class PlayerService {
             throw new RuntimeException("Chance card not found in inventory.");
         }
     }
+
+    public void clearInventories(List<String> playerIds) {
+        for (String playerId : playerIds) {
+            Player player = players.get(playerId);
+
+            if (player == null) {
+                continue;
+            }
+
+            player.getInventory().clear();
+        }
+    }
 }

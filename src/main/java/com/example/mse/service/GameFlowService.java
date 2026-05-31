@@ -301,6 +301,9 @@ public class GameFlowService {
 
         // 같은 방에서 다시 시작할 수 있도록 게임 진행 상태 해제
         room.setStarted(false);
+        
+        // 게임 종료 시 해당 방 플레이어들의 찬스카드 인벤토리 초기화
+        playerService.clearInventories(room.getPlayerIds());
 
         // 턴 정보 초기화
         room.getTurnInfo().setCurrentTurnPlayerId(null);

@@ -12,6 +12,7 @@ import com.example.mse.dto.BoardStatusResponse;
 import com.example.mse.dto.GameStateResponse;
 import com.example.mse.dto.PieceInfo;
 import com.example.mse.dto.PlayerEffectInfo;
+import com.example.mse.dto.PlayerInfo;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Piece;
 import com.example.mse.model.PlayerEffect;
@@ -35,7 +36,16 @@ public class GameStateAssembler {
         response.setRoomInfo(roomService.toRoomInfo(room));
         response.setTurnInfo(room.getTurnInfo());
         response.setTurnPhase(room.getTurnPhase());
-        response.setPlayers(playerService.getPlayerInfoByIds(room.getPlayerIds()));
+
+        List<PlayerInfo> players = playerService.getPlayerInfoByIds(room.getPlayerIds());
+
+        for (PlayerInfo player : players) {
+            if (!player.getPlayerId().equals(playerId)) {
+                player.getInventory().clear();
+            }
+        }
+
+        response.setPlayers(players);
 
         BoardStatusResponse boardStatus = new BoardStatusResponse();
 
