@@ -47,11 +47,6 @@ public class GameFlowService {
         room.getMoveHistory().add(response);
     }
 
-    public void startPrivateThrowPhase(GameRoom room) {
-
-        room.setTurnPhase(TurnPhase.PRIVATE_THROW);
-    }
-
     public void startPrivateThrowResultPhase(GameRoom room) {
         room.setTurnPhase(TurnPhase.PRIVATE_THROW_RESULT);
     }
@@ -249,11 +244,6 @@ public class GameFlowService {
         room.setTurnPhase(TurnPhase.PRIVATE_THROW);
     }
 
-    public void handleExtraTurn(GameRoom room) {
-        resetForExtraTurn(room);
-
-        room.setTurnPhase(TurnPhase.PRIVATE_THROW);
-    }
 
     public void addCurrentResultToPending(GameRoom room) {
         if (room.getCurrentYutResult() == null) {
@@ -327,11 +317,6 @@ public class GameFlowService {
     }
 
     public void resetForNextTurn(GameRoom room) {
-        resetThrowState(room);
-        resetChallengeState(room);
-    }
-
-    public void resetForExtraTurn(GameRoom room) {
         resetThrowState(room);
         resetChallengeState(room);
     }
