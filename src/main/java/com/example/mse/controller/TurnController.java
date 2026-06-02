@@ -50,6 +50,10 @@ public class TurnController {
         ThrowResponse response = yutService.getThrowResponse(room);
 
         if (isCatchBonusThrow) {
+            response.getYutResult().setSource("CATCH_BONUS");
+            response.getYutResult().setSourceCard(null);
+            response.getYutResult().setExtraTurn(false);
+
             gameFlowService.startCatchBonusThrowResultPhase(room);
 
             gameFlowService.addLog(
