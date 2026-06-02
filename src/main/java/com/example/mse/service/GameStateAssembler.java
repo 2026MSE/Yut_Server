@@ -43,6 +43,11 @@ public class GameStateAssembler {
             if (!player.getPlayerId().equals(playerId)) {
                 player.getInventory().clear();
             }
+// 영준 추가 6/2 실제 player모델에서 이모티콘 값을 가져와 세팅
+            com.example.mse.model.Player originalPlayer = playerService.get(player.getPlayerId());
+            if (originalPlayer != null && originalPlayer.getCurrentEmoticon() != null) {
+                player.setCurrentEmoticon(originalPlayer.getCurrentEmoticon());
+            }
         }
 
         response.setPlayers(players);

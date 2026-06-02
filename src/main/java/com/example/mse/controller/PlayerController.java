@@ -13,6 +13,8 @@ import com.example.mse.model.Player;
 import com.example.mse.service.DiceBearService;
 import com.example.mse.service.PlayerService;
 
+import com.example.mse.dto.EmoticonRequest; // DTO import 추가 영준 6/2
+
 @RestController
 @RequestMapping("/api/avatar")
 @CrossOrigin(origins = "*")
@@ -59,5 +61,11 @@ public class PlayerController {
     @GetMapping("/players")
     public ApiResponse<Map<String, Player>> getAllPlayers() {
         return ApiResponse.ok("All players loaded.", playerService.getAll());
+    }
+//6/2 유니티에서 이모티콘 선택 시 호출할 rest api를 만들어줌
+    @PostMapping("/emoticon")
+    public ApiResponse<Void> updateEmoticon(@RequestBody EmoticonRequest request) {
+        playerService.updateEmoticon(request.getPlayerId(), request.getEmoticonUrl());
+        return ApiResponse.ok("Emoticon updated.", null);
     }
 }

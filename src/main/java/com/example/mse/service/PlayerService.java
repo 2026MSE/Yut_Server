@@ -116,4 +116,13 @@ public class PlayerService {
             player.getInventory().clear();
         }
     }
+// 영준 6/2 클라이언트가 보낸 이모티콘 정보를 실제 player 객체에 업데이트 하는 매서드 추가
+    public void updateEmoticon(String playerId, String emoticonUrl){
+        Player player = players.get(playerId);
+        if(player != null){
+            player.setCurrentEmoticon(emoticonUrl);
+        }else {
+            throw new RuntimeException("Player not found");
+        }
+    }
 }
