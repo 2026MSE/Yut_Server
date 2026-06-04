@@ -11,7 +11,9 @@ import com.example.mse.model.EffectType;
 import com.example.mse.model.GameLog;
 import com.example.mse.model.GameRoom;
 import com.example.mse.model.Piece;
+import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
+import com.example.mse.model.YutResult;
 
 @Service
 public class GameFlowService {
@@ -244,7 +246,6 @@ public class GameFlowService {
         room.setTurnPhase(TurnPhase.PRIVATE_THROW);
     }
 
-
     public void addCurrentResultToPending(GameRoom room) {
         if (room.getCurrentYutResult() == null) {
             return;
@@ -336,6 +337,42 @@ public class GameFlowService {
             throw new RuntimeException("Not in challenge result phase.");
         }
 
+        applyAcceptedDeclaredResult(room);
+
         proceedAfterThrowResolved(room);
+    }
+
+    private void applyAcceptedDeclaredResult(GameRoom room) {
+        if (room.getDeclaredPrivateSticks() == null) {
+            return;
+        }
+
+        // 챌린지 성공 = 거짓 선언이 들킴
+        // 이 경우 선언 결과를 적용하면 안 되고, 실제 currentYutResult를 유지해야 함
+        if (room.getLastJudgeResponse() != null
+                && room.getLastJudgeResponse().getJudgeResult() == JudgeResult.CHALLENGE_SUCCESS) {
+            return;
+        }
+
+        StickSide[] declaredPrivate = room.getDeclaredPrivateSticks();
+        StickSide[] publicSticks = room.getPublicSticks();
+
+        StickSide[] acceptedSticks = new StickSide[declaredPrivate.length + publicSticks.length];
+
+        int index = 0;
+
+        for (StickSide stick : declaredPrivate) {
+            acceptedSticks[index++] = stick;
+        }
+
+        for (StickSide stick : publicSticks) {
+            acceptedSticks[index++] = stick;
+        }
+
+        YutResult acceptedResult = yutService.calculateResultFromSticks(acceptedSticks);
+        acceptedResult.setSource("THROW");
+        acceptedResult.setSourceCard(null);
+
+        room.setCurrentYutResult(acceptedResult);
     }
 }

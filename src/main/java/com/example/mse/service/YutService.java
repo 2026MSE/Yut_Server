@@ -153,4 +153,8 @@ public class YutService {
 
         room.setPrivateStickCount(2);
     }
+
+    public YutResult calculateResultFromSticks(StickSide[] sticks) {
+        return calculateResult(sticks);
+    }
 }
