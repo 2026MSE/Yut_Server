@@ -1,5 +1,8 @@
 package com.example.mse.service;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,7 @@ import com.example.mse.model.GameRoom;
 import com.example.mse.model.Piece;
 import com.example.mse.model.StickSide;
 import com.example.mse.model.TurnPhase;
+import com.example.mse.model.YutName;
 import com.example.mse.model.YutResult;
 
 @Service
@@ -272,7 +276,13 @@ public class GameFlowService {
             resetChallengeState(room);
             room.setTurnPhase(TurnPhase.PRIVATE_THROW);
         } else {
-            startMovePhase(room);
+            removeUnmovableBackDoResults(room);
+
+            if (room.getPendingYutResults().isEmpty()) {
+                finishMovePhase(room);
+            } else {
+                startMovePhase(room);
+            }
         }
     }
 
@@ -320,6 +330,69 @@ public class GameFlowService {
     public void resetForNextTurn(GameRoom room) {
         resetThrowState(room);
         resetChallengeState(room);
+    }
+
+    private void removeUnmovableBackDoResults(GameRoom room) {
+        String currentPlayerId = room.getTurnInfo().getCurrentTurnPlayerId();
+
+        if (currentPlayerId == null) {
+            return;
+        }
+
+        List<Piece> pieces = room.getBoard().getPieces().get(currentPlayerId);
+
+        if (pieces == null || pieces.isEmpty()) {
+            return;
+        }
+
+        Iterator<YutResult> iterator = room.getPendingYutResults().iterator();
+
+        while (iterator.hasNext()) {
+            YutResult result = iterator.next();
+
+            if (result.getResult() != YutName.BACK_DO) {
+                continue;
+            }
+
+            if (!canMoveBackDo(room, pieces)) {
+                iterator.remove();
+
+                addLog(
+                        room,
+                        "AUTO_SKIP",
+                        "BACK_DO was skipped because no piece can move backward.");
+            }
+        }
+    }
+
+    private boolean canMoveBackDo(GameRoom room, List<Piece> pieces) {
+        for (Piece piece : pieces) {
+            if (piece.getCurrentPosition() == 99) {
+                continue;
+            }
+
+            if (piece.getCarriedByPieceId() != null) {
+                continue;
+            }
+
+            int currentPosition = piece.getCurrentPosition();
+
+            // 대기석(-1)과 시작점(0)에서는 BACK_DO로 이동 불가
+            if (currentPosition == -1 || currentPosition == 0) {
+                continue;
+            }
+
+            int targetPosition = boardService.calculateNextPath(
+                    room.getBoard(),
+                    currentPosition,
+                    -1);
+
+            if (targetPosition != currentPosition) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void startCatchBonusThrow(GameRoom room) {
