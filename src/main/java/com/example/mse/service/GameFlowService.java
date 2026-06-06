@@ -280,6 +280,7 @@ public class GameFlowService {
 
             if (room.getPendingYutResults().isEmpty()) {
                 finishMovePhase(room);
+                endTurn(room);
             } else {
                 startMovePhase(room);
             }
