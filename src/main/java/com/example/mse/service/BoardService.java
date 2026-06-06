@@ -1,17 +1,18 @@
 //26.05.07 찬미 말 이동결과 enum으로 변경, 대기석(-1) 처리 추가, 그에 따른 업기랑 잡기 부분 수정
 package com.example.mse.service;
 
-import com.example.mse.model.Board;
-import com.example.mse.model.BoardNode;
-import com.example.mse.model.Piece;
-import com.example.mse.model.MoveType;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import org.springframework.stereotype.Service;
+
+import com.example.mse.model.Board;
+import com.example.mse.model.BoardNode;
+import com.example.mse.model.MoveType;
+import com.example.mse.model.Piece;
 
 @Service
 public class BoardService {
@@ -20,7 +21,6 @@ public class BoardService {
     public Map<Integer, BoardNode> initBoard() {
         Map<Integer, BoardNode> boardMap = new HashMap<>();
 
-        // 1. 0~28번까지 총 29개의 노드 생성 (0번은 시작점이자 도착점)
         for (int i = 0; i <= 28; i++) {
             boardMap.put(i, new BoardNode(i));
         }
@@ -30,22 +30,31 @@ public class BoardService {
         }
         boardMap.get(19).setNextNodeId(0);
 
-        boardMap.get(5).setFastNodeId(20);
-        boardMap.get(20).setFastNodeId(21);
-        boardMap.get(21).setFastNodeId(22);
+        // --- 수정 시작 (지름길 내부 노드는 setNextNodeId로 연결) ---
 
-        boardMap.get(10).setFastNodeId(23);
-        boardMap.get(23).setFastNodeId(24);
-        boardMap.get(24).setFastNodeId(22);
+        // 우측 하단 -> 중앙
+        boardMap.get(5).setFastNodeId(20);   // 5번(모서리)에서 꺾는 건 Fast
+        boardMap.get(20).setNextNodeId(21);  // 외길이므로 Next
+        boardMap.get(21).setNextNodeId(22);  // 외길이므로 Next
 
-        boardMap.get(22).setFastNodeId(25);
-        boardMap.get(22).setNextNodeId(27);
+        // 좌측 상단 -> 중앙
+        boardMap.get(10).setFastNodeId(23);  // 10번(모서리)에서 꺾는 건 Fast
+        boardMap.get(23).setNextNodeId(24);  // 외길
+        boardMap.get(24).setNextNodeId(22);  // 외길
 
-        boardMap.get(25).setFastNodeId(26);
-        boardMap.get(26).setFastNodeId(0);
+        // 중앙(22번)에서의 분기
+        boardMap.get(22).setFastNodeId(25);  // 중앙에서 우측 상단으로 가는 길
+        boardMap.get(22).setNextNodeId(27);  // 중앙에서 좌측 하단으로 가는 길
 
-        boardMap.get(27).setFastNodeId(28);
-        boardMap.get(28).setFastNodeId(15);
+        // 중앙 -> 우측 상단
+        boardMap.get(25).setNextNodeId(26);  // 외길
+        boardMap.get(26).setNextNodeId(0);   // 도착점(0번)으로 바로 연결
+
+        // 중앙 -> 좌측 하단
+        boardMap.get(27).setNextNodeId(28);  // 외길
+        boardMap.get(28).setNextNodeId(15);  // 외길
+        
+        // --- 수정 끝 ---
 
         return boardMap;
     }
